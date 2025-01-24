@@ -1,3 +1,10 @@
-{
-	
-}
+[
+    {
+        "pseudo" : "test",
+        "score" : 1000
+    },
+    {
+        "pseudo" : "test2",
+        "score" : 1200
+    }
+]

@@ -1,0 +1,11 @@
+@font-face {
+	font-family: spiegel;
+	src: url("../font/SpiegelSans-5Regular_TRIAL.otf");
+}
+*{
+	font-family: spiegel;
+}
+img{
+	scale: 3;
+	image-rendering:pixelated;
+}

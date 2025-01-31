@@ -37,15 +37,22 @@ main{
     min-height: 100%;
     z-index: -1;
   }
-main>h1{
+main>div>h1{
     color: white;
     margin-left: 5vw;
     font-size: 800%;
     transition: 0.2s;
     user-select: none;
+    margin-top: 2vh;
 }
-main>h1:hover{
+main>div>h2, h3{
+    margin-left: 5vw;
+}
+main>div>h1:hover{
     color: rgb(207, 152, 12);
     font-size: 1000%;
     cursor: pointer;
+}
+#btnScore{
+    font-size: 400%;
 }

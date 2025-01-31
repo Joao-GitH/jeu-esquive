@@ -36,19 +36,29 @@ closebtn.addEventListener("click", () => {
 
 function genererClassement(data) 
 {
-    for (let i = 0; i < data.lenght; i++) {
-        if (data[i].score < data[i + 1].score) {
-            let scorePetit = data[i].score;
-            data[i].score = data[i + 1].score;
-            data[i + 1].score = scorePetit;
-        }
+
+    data.sort((a, b) => b.score - a.score)
+    let tableau = document.querySelector("table");
+    let titre = document.createElement("tr")
+    titre.innerText = "Score :"
+    tableau.appendChild(titre)
+    if (data.length < 50)
+    {
+        data.forEach(element => {
+            let affichage = document.createElement("tr");
+            affichage.innerText = `${element.pseudo} : ${element.score}`;
+            tableau.appendChild(affichage)
+        });
+    }
+    else
+    {
+        for(let i = 0; i < 50; i++)
+            {
+                let affichage = document.createElement("tr");
+                affichage.innerText = `${data[i].pseudo} : ${data[i].score}`;
+                tableau.appendChild(affichage)
+            }
     }
 
-    let tableau = document.querySelector("table");
-    data.forEach(element => {
-        let affichage = document.createElement("tr");
-        affichage.innerText = `${element.pseudo} : ${element.score}`;
-        tableau.appendChild(affichage)
-    });
 
 }

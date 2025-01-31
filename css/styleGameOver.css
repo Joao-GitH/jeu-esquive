@@ -43,6 +43,7 @@ p {
 
 #closebtn {
     margin-top: 3px;
+
 }
 
 .popup button {
@@ -50,7 +51,7 @@ p {
 }
 
 button {
-    background-color: rgb(0, 0, 0);
+    background: rgb(13, 165, 13);
     color: white;
     border-radius: 5px;
     height: 36px;

@@ -1,0 +1,15 @@
+.boule{
+    background-color: red;
+}
+body{
+    overflow: hidden;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+}
+#joueur{
+    background-color: blue;
+    width: 5vw;
+    height: 5vh;
+}

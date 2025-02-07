@@ -1,10 +1,23 @@
 import { API } from "./api.js";
-let score = document.getElementById("btnScore")
-let divScore = document.getElementById("score")
-score.addEventListener("click" , (e)=>{
-    API.selectAllUsers().then(result => {
-        result.forEach(element => {
-            let titre = document.createElement("")
-        });
-    })
+
+API.selectAllUsers().then((r) => {
+    for (let i = 0; i < r.length; i++) {
+        const user = r[i];
+        createUserEntry(user, i);
+    }
 })
+
+/**
+ * Description placeholder
+ *
+ * @param {{username:string, score:number}} user 
+ * @param {number} index 
+ */
+function createUserEntry(user, index){
+    const div = document.createElement("div");
+    div.innerHTML = `<p>${index + 1}.</p>`
+    const p = document.createElement("p");
+    p.textContent = `${user.username} : ${user.score}`;
+    div.append(p);
+    document.querySelector("#leaderboard").append(div);
+}

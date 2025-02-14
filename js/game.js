@@ -141,7 +141,7 @@ function movefireball(p) {
         p.x += p.vector.x;
         p.y += p.vector.y;
     if (p.x < 0 || p.x > screen.width) {
-        p.element.remove()
+        pl.element.remove()
         return
     }
     if (p.y < 0 || p.y > screen.height) {
@@ -152,7 +152,5 @@ function movefireball(p) {
         p.x + p.width > player.x &&
         p.y < player.y + player.height &&
         p.y + p.height > player.y) {
-        p.element.remove()
-        return
     }
 }

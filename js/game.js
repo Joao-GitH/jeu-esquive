@@ -68,7 +68,7 @@ function Main() {
 
 // Fonction pour générer une boule à une position donnée
 function GenererBoule(p) {
-    let boule = document.createElement("div") // Création d'un élément div
+    let boule = document.createElement("img") // Création d'un élément div
     boule.classList.add("boule") // Ajout d'une classe CSS pour le style
     let body = document.querySelector("body") // Sélection du corps de la page
     body.append(boule) // Ajout de la boule au body
@@ -144,7 +144,7 @@ function movefireball(p) {
         p.element.remove()
         return
     }
-    else if (p.y < 0 || p.y > screen.height) {
+    if (p.y < 0 || p.y > screen.height) {
         p.element.remove()
         return
     }

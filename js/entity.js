@@ -14,16 +14,16 @@ class Entity{
         this.speed = 5;
     }
 
-    get x(){return this.element.getBoundingClientRect().left}
+    get x(){return parseInt(this.element.style.left)}
     set x(value){this.element.style.left = `${value}px`}
 
-    get y(){return this.element.getBoundingClientRect().top}
+    get y(){return parseInt(this.element.style.top)}
     set y(value){this.element.style.top = `${value}px`}
 
-    get width(){return parseInt(this.element.style.width)}
+    get width(){return this.element.getBoundingClientRect().width}
     set width(value){this.element.style.width = `${value}px`}
 
-    get height(){return parseInt(this.element.style.height)}
+    get height(){return this.element.getBoundingClientRect().height}
     set height(value){this.element.style.height = `${value}px`}
 
     magnitude() {

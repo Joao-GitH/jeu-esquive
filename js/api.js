@@ -1,5 +1,5 @@
 export class API{
-	static url = "http://localhost/jeu-esquive/backend/api.php";
+	static url = "backend/api.php";
 	
 	/**
 	 * @returns {Promise<{username: string, score:number}[]>} 

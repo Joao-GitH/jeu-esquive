@@ -41,17 +41,8 @@ window.addEventListener(`contextmenu`, (e) => {
         animations.forEach(animation => animation.cancel()); // Annule toutes les animations
         return
     }
-
-    player.target.x = e.clientX
-    player.target.y = e.clientY
-    player.vector.x = player.target.x - player.x;
-    player.vector.y = player.target.y - player.y;
-    player.normalize();
-    player.vector.x *= player.speed;
-    player.vector.y *= player.speed;
-    
-});
-
+}
+///
 function move() {
     if(player.distance() > player.magnitude()){
         player.x += player.vector.x;

@@ -1,10 +1,69 @@
-let joueur = document.getElementById("joueur")
+class Fireball extends Entity{
+    
+    /**
+     * Creates an instance of Player.
+     *
+     * @constructor
+     * @param {HTMLDivElement} element 
+     */
+    constructor(element){
+        super(element)
+        this.speed = getRandomArbitrary(5,10)
+
+    }
+
+}
+
+class Player extends Entity{
+    
+    /**
+     * Creates an instance of Player.
+     *
+     * @constructor
+     * @param {HTMLDivElement} element 
+     */
+    constructor(element){
+        super(element)
+    }
+}
+
+const player = new Player(document.querySelector("#joueur"));
+
+window.addEventListener(`contextmenu`, (e) => {
+    e.preventDefault();
+    let div = document.querySelector("div");
+    let animations = div.getAnimations();
+    if (animations.length > 0) {
+        console.log("Animation détectée, annulation en cours...");
+        animations.forEach(animation => animation.cancel()); // Annule toutes les animations
+        return
+    }
+
+    player.target.x = e.clientX
+    player.target.y = e.clientY
+    player.vector.x = player.target.x - player.x;
+    player.vector.y = player.target.y - player.y;
+    player.normalize();
+    player.vector.x *= player.speed;
+    player.vector.y *= player.speed;
+    
+});
+
+function move() {
+    if(player.distance() > player.magnitude()){
+        player.x += player.vector.x;
+        player.y += player.vector.y;
+    }
+    requestAnimationFrame(move);
+}
+move();
+
 Main()
 // Fonction principale qui démarre la génération des boules
 function Main() {
     setInterval(() => {
         GenererBoule(GenererPosition()) // Génère une boule toutes les secondes
-    }, 100)
+    }, 1000)
 }
 
 // Fonction pour générer une boule à une position donnée
@@ -20,8 +79,8 @@ function GenererBoule(p) {
     boule.style.position = "absolute"
     boule.style.top = `${p[1]}px` // Position verticale aléatoire
     boule.style.left = `${p[0]}px` // Position horizontale aléatoire
-
-    GenererDirection(boule) // Démarre le mouvement de la boule
+    let fireball = new Fireball(boule)
+    GenererDirection(fireball) // Démarre le mouvement de la boule
 }
 
 // Fonction pour générer une position aléatoire sur les bords de l'écran
@@ -29,7 +88,7 @@ function GenererPosition() {
     let choixPosition = Math.floor(Math.random() * 2) // Choisir entre X ou Y comme point de départ
     if (choixPosition == 1) {
         let positionX = Math.floor(Math.random() * screen.width)
-        if (positionX > screen.width - 50) {
+        if (positionX > screen.width - 150) {
             let positionY = Math.floor(Math.random() * screen.height)
             return [positionX, positionY]
         }
@@ -58,26 +117,40 @@ function GenererPosition() {
     }
 }
 
+function getRandomArbitrary(min, max) {
+    return Math.random() * (max - min) + min;
+  }
+  
+
 // Fonction qui génère une direction aléatoire et fait bouger la boule
 function GenererDirection(p) {
-    let vitesseX = Math.floor(Math.random() * 10 - 5) // Vitesse horizontale entre -5 et 5 pixels
-    if (vitesseX == 0) {
-        vitesseX = 2
-    }
-    let vitesseY = Math.floor(Math.random() * 10 - 5) // Vitesse verticale entre -5 et 5 pixels
-    if (vitesseY == 0) {
-        vitesseY = 2
-    }
+    
+    p.target.x = player.x
+    p.target.y = player.y
+    p.vector.x = p.target.x - p.x;
+    p.vector.y = p.target.y - p.y;
+    p.normalize();
+    p.vector.x *= p.speed;
+    p.vector.y *= p.speed;
     setInterval(() => {
-        let pActuelleY = parseInt(p.style.top) // Récupère la position Y actuelle
-        let pActuelleX = parseInt(p.style.left) // Récupère la position X actuelle
-        p.style.left = `${pActuelleX + vitesseX}px` // Déplace horizontalement
-        p.style.top = `${pActuelleY + vitesseY}px` // Déplace verticalement
-        if (pActuelleX < 0 || pActuelleX > screen.width) {
-            p.remove()
-        }
-        else if (pActuelleY < 0 || pActuelleY > screen.height) {
-            p.remove()
-        }
-    }, 1000 / 200); // Rafraîchissement rapide pour un mouvement fluide
+        movefireball(p)
+    }, 1000 / 60); // Rafraîchissement rapide pour un mouvement fluide
+}
+/** @param {Fireball} p  */
+function movefireball(p) {
+        p.x += p.vector.x;
+        p.y += p.vector.y;
+    if (p.x < 0 || p.x > screen.width) {
+        p.element.remove()
+        return
+    }
+    else if (p.y < 0 || p.y > screen.height) {
+        p.element.remove()
+        return
+    }
+    if (player.x > p.x && player.x < p.x + p.width && player.y > p.y && player.y < p.y + p.height) {
+        p.element.remove()
+        return
+    }
+    requestAnimationFrame(movefireball);
 }

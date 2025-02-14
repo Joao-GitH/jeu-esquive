@@ -13,14 +13,14 @@ function GenererBoule(p) {
     boule.classList.add("boule") // Ajout d'une classe CSS pour le style
     let body = document.querySelector("body") // Sélection du corps de la page
     body.append(boule) // Ajout de la boule au body
-    
+
     // Définition des styles de la boule
     boule.style.height = "50px"
     boule.style.width = "50px"
     boule.style.position = "absolute"
     boule.style.top = `${p[1]}px` // Position verticale aléatoire
     boule.style.left = `${p[0]}px` // Position horizontale aléatoire
-    
+
     GenererDirection(boule) // Démarre le mouvement de la boule
 }
 
@@ -61,12 +61,23 @@ function GenererPosition() {
 // Fonction qui génère une direction aléatoire et fait bouger la boule
 function GenererDirection(p) {
     let vitesseX = Math.floor(Math.random() * 10 - 5) // Vitesse horizontale entre -5 et 5 pixels
+    if (vitesseX == 0) {
+        vitesseX = 2
+    }
     let vitesseY = Math.floor(Math.random() * 10 - 5) // Vitesse verticale entre -5 et 5 pixels
-    
+    if (vitesseY == 0) {
+        vitesseY = 2
+    }
     setInterval(() => {
         let pActuelleY = parseInt(p.style.top) // Récupère la position Y actuelle
         let pActuelleX = parseInt(p.style.left) // Récupère la position X actuelle
         p.style.left = `${pActuelleX + vitesseX}px` // Déplace horizontalement
         p.style.top = `${pActuelleY + vitesseY}px` // Déplace verticalement
+        if (pActuelleX < 0 || pActuelleX > screen.width) {
+            p.remove()
+        }
+        else if (pActuelleY < 0 || pActuelleY > screen.height) {
+            p.remove()
+        }
     }, 1000 / 200); // Rafraîchissement rapide pour un mouvement fluide
 }

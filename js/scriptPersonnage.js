@@ -22,7 +22,7 @@ window.addEventListener(`contextmenu`, (e) => {
     let posYdiv = parseInt(getComputedStyle(div).top) || 0;
     let largeurDiv = parseInt(getComputedStyle(div).width) || 0;
     let hauteurDiv = parseInt(getComputedStyle(div).height) || 0;
-    let speed = 8;
+    let speed = 5;
     function move() {
 
         let dx = cliqueX - largeurDiv/2 - posXdiv;

@@ -26,28 +26,23 @@ class Player extends Entity{
         super(element)
     }
 }
+
+let posSourisXSpell = 0;
+let posSourisYSpell = 0;
+
 const player = new Player(document.querySelector("#joueur"));
-/// NEW
-let mouseDown = false;
-addEventListener("mouseup", () => mouseDown = false)
-addEventListener("mousedown", (e) => {
-    mouseDown = true
-    movePlayer(e);
-})
-addEventListener("contextmenu", e => e.preventDefault())
-window.addEventListener("mousemove", movePlayer);
-function movePlayer(e){
-    if(mouseDown){
-        player.target.x = e.clientX
-        player.target.y = e.clientY
-        player.vector.x = player.target.x - player.x;
-        player.vector.y = player.target.y - player.y;
-        player.normalize();
-        player.vector.x *= player.speed;
-        player.vector.y *= player.speed;
+
+window.addEventListener(`contextmenu`, (e) => {
+    e.preventDefault();
+    let div = document.querySelector("div");
+    let animations = div.getAnimations();
+    if (animations.length > 0) {
+        console.log("Animation détectée, annulation en cours...");
+        animations.forEach(animation => animation.cancel()); // Annule toutes les animations
+        return
     }
-}
-///
+})
+
 function move() {
     if(player.distance() > player.magnitude()){
         player.x += player.vector.x;
@@ -153,3 +148,43 @@ function movefireball(p) {
     }
 }
 
+window.addEventListener("keypress", (e)=>{
+    console.log(e.key);
+    let posSourisX = posSourisXSpell
+    let posSourisY = posSourisYSpell
+    if (e.key == "f")
+    {
+        
+        player.x = posSourisX + ((player.x - posSourisX)/1.35);
+        player.y = posSourisY + ((player.y - posSourisY)/1.35);
+        
+
+        player.vector.x = 0;
+        player.vector.y = 0
+    }
+    if (e.key === "e") {
+        let divPlayer = document.querySelector("#joueur");
+        player.speed = 10;
+        let count = 0;
+        let isBlue = false; // Permet d'alterner entre bleu clair et bleu foncé
+    
+        const interval = setInterval(() => {
+            divPlayer.style.backgroundColor = isBlue ? "blue" : "lightblue";
+            isBlue = !isBlue; // Alterne entre bleu et bleu clair
+    
+            count++;
+            if (count >= 30) { // 30 cycles = 15 secondes (1 cycle = 500ms)
+                clearInterval(interval);
+                divPlayer.style.backgroundColor = "blue"; // Assure un retour en bleu à la fin
+                player.speed = 5; // Réinitialisation de la vitesse
+            }
+        }, 500); // Alterne toutes les 500ms pour 1s complète entre bleu et bleu clair
+    }
+    
+})
+
+document.addEventListener('mousemove', function(event) {
+    posSourisXSpell = event.clientX
+    posSourisYSpell = event.clientY
+    
+});

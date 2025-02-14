@@ -1,6 +1,7 @@
 import { API } from "./api.js";
 
 API.selectAllUsers().then((r) => {
+    r.sort((a, b) => b.score - a.score)
     for (let i = 0; i < r.length; i++) {
         const user = r[i];
         createUserEntry(user, i);

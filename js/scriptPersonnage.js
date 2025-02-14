@@ -41,8 +41,8 @@ window.addEventListener(`contextmenu`, (e) => {
         animations.forEach(animation => animation.cancel()); // Annule toutes les animations
         return
     }
-}
-///
+})
+
 function move() {
     if(player.distance() > player.magnitude()){
         player.x += player.vector.x;

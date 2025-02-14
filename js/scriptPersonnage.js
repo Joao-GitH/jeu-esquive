@@ -1,9 +1,49 @@
-document.addEventListener("DOMContentLoaded", (e)=>{
-    let main = document.querySelector("main");
-    let div = document.createElement("div");
-    main.appendChild(div)
-})
+class Player{
+    
+    /**
+     * Creates an instance of Player.
+     *
+     * @constructor
+     * @param {HTMLDivElement} element 
+     */
+    constructor(element){
+        this.element = element;
+        this.element.style.position = "absolute";
+        this.vector = {x:0, y:0};
+        this.target = {x:0, y:0}
+        this.speed = 5;
+    }
 
+    get x(){return this.element.getBoundingClientRect().left}
+    set x(value){this.element.style.left = `${value}px`}
+
+    get y(){return this.element.getBoundingClientRect().top}
+    set y(value){this.element.style.top = `${value}px`}
+
+    get width(){return parseInt(this.element.style.width)}
+    set width(value){this.element.style.width = `${value}px`}
+
+    get height(){return parseInt(this.element.style.height)}
+    set height(value){this.element.style.height = `${value}px`}
+
+    magnitude() {
+        return Math.sqrt(this.vector.x * this.vector.x + this.vector.y * this.vector.y);
+    }
+    normalize() {
+        const mag = this.magnitude();
+        if (mag === 0) {
+            this.vector.x = 0;
+            this.vector.y = 0;
+        }
+        this.vector.x /= mag;
+        this.vector.y /= mag;
+    }
+    distance(){
+        return Math.sqrt(Math.pow(this.x - this.target.x, 2) + Math.pow(this.y - this.target.y, 2))
+    }
+}
+
+const player = new Player(document.querySelector("div"));
 
 window.addEventListener(`contextmenu`, (e) => {
     e.preventDefault();
@@ -15,33 +55,21 @@ window.addEventListener(`contextmenu`, (e) => {
         return
     }
 
-    let cliqueX = e.clientX
-    let cliqueY = e.clientY
+    player.target.x = e.clientX
+    player.target.y = e.clientY
+    player.vector.x = player.target.x - player.x;
+    player.vector.y = player.target.y - player.y;
+    player.normalize();
+    player.vector.x *= player.speed;
+    player.vector.y *= player.speed;
     
-    let posXdiv = parseInt(getComputedStyle(div).left) || 0;
-    let posYdiv = parseInt(getComputedStyle(div).top) || 0;
-    let largeurDiv = parseInt(getComputedStyle(div).width) || 0;
-    let hauteurDiv = parseInt(getComputedStyle(div).height) || 0;
-    let speed = 5;
-    function move() {
-
-        let dx = cliqueX - largeurDiv/2 - posXdiv;
-        let dy = cliqueY -  hauteurDiv - posYdiv;
-        let distance = Math.sqrt(dx * dx + dy * dy);
-
-        if (distance < speed) {
-            div.style.left = cliqueX - largeurDiv/2 + "px";
-            div.style.top = cliqueY - hauteurDiv + "px";
-        } else {
-            posXdiv += (dx / distance) * speed;
-            posYdiv += (dy / distance) * speed;
-            div.style.left = posXdiv + "px";
-            div.style.top = posYdiv + "px";
-            requestAnimationFrame(move);
-        }
-    }
-
-    move();
-
 });
 
+function move() {
+    if(player.distance() > player.magnitude()){
+        player.x += player.vector.x;
+        player.y += player.vector.y;
+    }
+    requestAnimationFrame(move);
+}
+move();

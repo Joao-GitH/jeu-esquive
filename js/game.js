@@ -34,8 +34,10 @@ function move() {
         player.normalize();
         player.vector.x *= player.speed;
         player.vector.y *= player.speed;
-
     }
+    else
+        player.vector = {x:0, y:0};
+    player.updateAnimation();
     requestAnimationFrame(move);
 }
 move();

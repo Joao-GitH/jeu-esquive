@@ -26,6 +26,8 @@ class Entity{
     get height(){return this.element.getBoundingClientRect().height}
     set height(value){this.element.style.height = `${value}px`}
 
+    get center(){return {x:this.x + this.width / 2, y:this.y + this.height / 2}}
+
     magnitude() {
         return Math.sqrt(this.vector.x * this.vector.x + this.vector.y * this.vector.y);
     }

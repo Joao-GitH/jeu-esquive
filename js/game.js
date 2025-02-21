@@ -1,28 +1,28 @@
-class Fireball extends Entity{
-    
+class Fireball extends Entity {
+
     /**
      * Creates an instance of Player.
      *
      * @constructor
      * @param {HTMLDivElement} element 
      */
-    constructor(element){
+    constructor(element) {
         super(element)
-        this.speed = getRandomArbitrary(5,10)
+        this.speed = getRandomArbitrary(5, 10)
 
     }
 
 }
 
-class Player extends Entity{
-    
+class Player extends Entity {
+
     /**
      * Creates an instance of Player.
      *
      * @constructor
      * @param {HTMLDivElement} element 
      */
-    constructor(element){
+    constructor(element) {
         super(element)
     }
 }
@@ -37,12 +37,12 @@ addEventListener("mousedown", (e) => {
 })
 addEventListener("contextmenu", e => e.preventDefault())
 window.addEventListener("mousemove", movePlayer);
-function movePlayer(e){
-    if(mouseDown){
+function movePlayer(e) {
+    if (mouseDown) {
         player.target.x = e.clientX
         player.target.y = e.clientY
-        player.vector.x = player.target.x - player.x;
-        player.vector.y = player.target.y - player.y;
+        player.vector.x = player.target.x - player.center.x;
+        player.vector.y = player.target.y - player.center.y;
         player.normalize();
         player.vector.x *= player.speed;
         player.vector.y *= player.speed;
@@ -50,9 +50,16 @@ function movePlayer(e){
 }
 
 function move() {
-    if(player.distance() > player.magnitude()){
+    if (!(player.target.x >= player.x && player.target.x <= player.width + player.x
+        && player.target.y >= player.y && player.target.y <= player.height + player.y)) {
         player.x += player.vector.x;
         player.y += player.vector.y;
+        player.vector.x = player.target.x - player.center.x;
+        player.vector.y = player.target.y - player.center.y;
+        player.normalize();
+        player.vector.x *= player.speed;
+        player.vector.y *= player.speed;
+
     }
     requestAnimationFrame(move);
 }
@@ -119,12 +126,12 @@ function GenererPosition() {
 
 function getRandomArbitrary(min, max) {
     return Math.random() * (max - min) + min;
-  }
-  
+}
+
 
 // Fonction qui génère une direction aléatoire et fait bouger la boule
 function GenererDirection(p) {
-    
+
     p.target.x = player.x
     p.target.y = player.y
     p.vector.x = p.target.x - p.x;
@@ -138,8 +145,8 @@ function GenererDirection(p) {
 }
 /** @param {Fireball} p  */
 function movefireball(p) {
-        p.x += p.vector.x;
-        p.y += p.vector.y;
+    p.x += p.vector.x;
+    p.y += p.vector.y;
     if (p.x < 0 || p.x > screen.width) {
         p.element.remove()
         return
@@ -152,20 +159,28 @@ function movefireball(p) {
         p.x + p.width > player.x &&
         p.y < player.y + player.height &&
         p.y + p.height > player.y) {
-            p.element.remove()
+        p.element.remove()
     }
 }
 
-window.addEventListener("keypress", (e)=>{
+let posSourisXSpell = 0;
+let posSourisYSpell = 0;
+
+document.addEventListener('mousemove', function (event) {
+    posSourisXSpell = event.clientX
+    posSourisYSpell = event.clientY
+
+});
+
+window.addEventListener("keypress", (e) => {
     console.log(e.key);
     let posSourisX = posSourisXSpell
     let posSourisY = posSourisYSpell
-    if (e.key == "f")
-    {
-        
-        player.x = posSourisX + ((player.x - posSourisX)/1.35);
-        player.y = posSourisY + ((player.y - posSourisY)/1.35);
-        
+    if (e.key == "f") {
+
+        player.x = posSourisX + ((player.x - posSourisX) / 1.35);
+        player.y = posSourisY + ((player.y - posSourisY) / 1.35);
+
 
         player.vector.x = 0;
         player.vector.y = 0
@@ -175,11 +190,11 @@ window.addEventListener("keypress", (e)=>{
         player.speed = 10;
         let count = 0;
         let isBlue = false; // Permet d'alterner entre bleu clair et bleu foncé
-    
+
         const interval = setInterval(() => {
             divPlayer.style.backgroundColor = isBlue ? "blue" : "lightblue";
             isBlue = !isBlue; // Alterne entre bleu et bleu clair
-    
+
             count++;
             if (count >= 30) { // 30 cycles = 15 secondes (1 cycle = 500ms)
                 clearInterval(interval);
@@ -188,5 +203,5 @@ window.addEventListener("keypress", (e)=>{
             }
         }, 500); // Alterne toutes les 500ms pour 1s complète entre bleu et bleu clair
     }
-    
+
 })

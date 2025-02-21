@@ -141,19 +141,16 @@ function movefireball(p) {
         p.x += p.vector.x;
         p.y += p.vector.y;
     if (p.x < 0 || p.x > screen.width) {
-        p.element.remove()
+        pl.element.remove()
         return
     }
     if (p.y < 0 || p.y > screen.height) {
         p.element.remove()
         return
     }
-    if (p.x > player.x && p.x < player.x + player.width && p.y > player.y && p.y < player.y + player.height) {
-        p.element.remove()
-        return
-    }
-    if (player.x > p.x && player.x < p.x + p.width && player.y > p.y && player.y < p.y + p.height) {
-        p.element.remove()
-        return
+    if (p.x < player.x + player.width &&
+        p.x + p.width > player.x &&
+        p.y < player.y + player.height &&
+        p.y + p.height > player.y) {
     }
 }

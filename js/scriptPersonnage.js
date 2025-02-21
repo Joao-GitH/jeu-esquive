@@ -1,36 +1,13 @@
-class Fireball extends Entity{
-    
-    /**
-     * Creates an instance of Player.
-     *
-     * @constructor
-     * @param {HTMLDivElement} element 
-     */
-    constructor(element){
-        super(element)
-        this.speed = getRandomArbitrary(5,10)
+import { AnimationStorage } from "./Storage/animationsStorage.js";
+import { Player, Fireball } from "./Entities/entities.js";
 
-    }
-
-}
-
-class Player extends Entity{
-    
-    /**
-     * Creates an instance of Player.
-     *
-     * @constructor
-     * @param {HTMLDivElement} element 
-     */
-    constructor(element){
-        super(element)
-    }
-}
-
-let posSourisXSpell = 0;
-let posSourisYSpell = 0;
 
 const player = new Player(document.querySelector("#joueur"));
+let underghost = false;
+let underShield = false;
+let cdShield = 0;
+let cdFlash = 0;
+let cdGhost = 0;
 
 let mouseDown = false;
 addEventListener("mouseup", () => mouseDown = false)
@@ -40,12 +17,12 @@ addEventListener("mousedown", (e) => {
 })
 addEventListener("contextmenu", e => e.preventDefault())
 window.addEventListener("mousemove", movePlayer);
-function movePlayer(e){
-    if(mouseDown){
+function movePlayer(e) {
+    if (mouseDown) {
         player.target.x = e.clientX
         player.target.y = e.clientY
-        player.vector.x = player.target.x - player.x;
-        player.vector.y = player.target.y - player.y;
+        player.vector.x = player.target.x - player.center.x;
+        player.vector.y = player.target.y - player.center.y;
         player.normalize();
         player.vector.x *= player.speed;
         player.vector.y *= player.speed;
@@ -53,9 +30,16 @@ function movePlayer(e){
 }
 
 function move() {
-    if(player.distance() > player.magnitude()){
+    if (!(player.target.x >= player.x && player.target.x <= player.width + player.x
+        && player.target.y >= player.y && player.target.y <= player.height + player.y)) {
         player.x += player.vector.x;
         player.y += player.vector.y;
+        player.vector.x = player.target.x - player.center.x;
+        player.vector.y = player.target.y - player.center.y;
+        player.normalize();
+        player.vector.x *= player.speed;
+        player.vector.y *= player.speed;
+
     }
     requestAnimationFrame(move);
 }
@@ -71,7 +55,7 @@ function Main() {
 
 // Fonction pour générer une boule à une position donnée
 function GenererBoule(p) {
-    let boule = document.createElement("div") // Création d'un élément div
+    let boule = document.createElement("img") // Création d'un élément div
     boule.classList.add("boule") // Ajout d'une classe CSS pour le style
     let body = document.querySelector("body") // Sélection du corps de la page
     body.append(boule) // Ajout de la boule au body
@@ -120,14 +104,9 @@ function GenererPosition() {
     }
 }
 
-function getRandomArbitrary(min, max) {
-    return Math.random() * (max - min) + min;
-  }
-  
-
 // Fonction qui génère une direction aléatoire et fait bouger la boule
 function GenererDirection(p) {
-    
+
     p.target.x = player.x
     p.target.y = player.y
     p.vector.x = p.target.x - p.x;
@@ -141,59 +120,95 @@ function GenererDirection(p) {
 }
 /** @param {Fireball} p  */
 function movefireball(p) {
-        p.x += p.vector.x;
-        p.y += p.vector.y;
+    p.x += p.vector.x;
+    p.y += p.vector.y;
     if (p.x < 0 || p.x > screen.width) {
         p.element.remove()
         return
     }
-    else if (p.y < 0 || p.y > screen.height) {
+    if (p.y < 0 || p.y > screen.height) {
         p.element.remove()
         return
     }
-    if (player.x > p.x && player.x < p.x + p.width && player.y > p.y && player.y < p.y + p.height) {
+    if (p.x < player.x + player.width &&
+        p.x + p.width > player.x &&
+        p.y < player.y + player.height &&
+        p.y + p.height > player.y) {
         p.element.remove()
-        return
     }
 }
 
-window.addEventListener("keypress", (e)=>{
+let posSourisXSpell = 0;
+let posSourisYSpell = 0;
+
+document.addEventListener('mousemove', function (event) {
+    posSourisXSpell = event.clientX
+    posSourisYSpell = event.clientY
+
+});
+
+window.addEventListener("keypress", (e) => {
     console.log(e.key);
     let posSourisX = posSourisXSpell
     let posSourisY = posSourisYSpell
-    if (e.key == "f")
-    {
-        
-        player.x = posSourisX + ((player.x - posSourisX)/1.35);
-        player.y = posSourisY + ((player.y - posSourisY)/1.35);
-        
+    if (e.key == "f") {
 
-        player.vector.x = 0;
-        player.vector.y = 0
+        if (cdFlash == 0)
+        {
+            cdFlash = 15000;
+            player.x = posSourisX + ((player.x - posSourisX) / 1.35);
+            player.y = posSourisY + ((player.y - posSourisY) / 1.35);
+            player.target.x = player.x;
+            player.target.y = player.y;
+            let timeoutCd = setTimeout((e)=>{
+                cdFlash = 0;
+            }, cdFlash)
+        }
+
+
     }
     if (e.key === "e") {
-        let divPlayer = document.querySelector("#joueur");
-        player.speed = 10;
-        let count = 0;
-        let isBlue = false; // Permet d'alterner entre bleu clair et bleu foncé
+        if (underghost == false)
+        {
+            underghost = true
+            cdGhost = 15000;
+            player.speed = 10;
+            let count = 0;
+            let isBlue = false; // Permet d'alterner entre bleu clair et bleu foncé
     
-        const interval = setInterval(() => {
-            divPlayer.style.backgroundColor = isBlue ? "blue" : "lightblue";
-            isBlue = !isBlue; // Alterne entre bleu et bleu clair
+            const interval = setInterval(() => {
+                player.element.style.backgroundColor = isBlue ? "blue" : "lightblue";
+                isBlue = !isBlue; // Alterne entre bleu et bleu clair
     
-            count++;
-            if (count >= 30) { // 30 cycles = 15 secondes (1 cycle = 500ms)
-                clearInterval(interval);
-                divPlayer.style.backgroundColor = "blue"; // Assure un retour en bleu à la fin
-                player.speed = 5; // Réinitialisation de la vitesse
-            }
-        }, 500); // Alterne toutes les 500ms pour 1s complète entre bleu et bleu clair
-    }
-    
-})
+                count++;
+                if (count >= 30) { // 30 cycles = 15 secondes (1 cycle = 500ms)
+                    clearInterval(interval);
+                    player.element.style.backgroundColor = "blue"; // Assure un retour en bleu à la fin
+                    player.speed = 5; // Réinitialisation de la vitesse
+                    let timeoutCd = setTimeout((e) =>{
+                        underghost = false
+                    }, cdGhost)
+                }
+            }, 500); // Alterne toutes les 500ms pour 1s complète entre bleu et bleu clair
+        }
 
-document.addEventListener('mousemove', function(event) {
-    posSourisXSpell = event.clientX
-    posSourisYSpell = event.clientY
-    
-});
+    }
+    if (e.key === "d")
+    {
+        if (cdShield == 0)
+        {
+            underShield = true;
+            cdShield = 15000
+            player.element.style.border = "solid black 3px"
+            let timeout = setTimeout((e) =>{
+                player.element.style.border = "none"
+                underShield = false;
+            }, 3000)
+            let timeoutCd = setTimeout((e) =>{
+                cdShield = 0;
+            },cdShield)
+        }
+
+    }
+
+})

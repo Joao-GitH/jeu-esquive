@@ -1,31 +1,6 @@
-class Fireball extends Entity {
+import { AnimationStorage } from "./Storage/animationsStorage.js";
+import { Player, Fireball } from "./Entities/entities.js";
 
-    /**
-     * Creates an instance of Player.
-     *
-     * @constructor
-     * @param {HTMLDivElement} element 
-     */
-    constructor(element) {
-        super(element)
-        this.speed = getRandomArbitrary(5, 10)
-
-    }
-
-}
-
-class Player extends Entity {
-
-    /**
-     * Creates an instance of Player.
-     *
-     * @constructor
-     * @param {HTMLDivElement} element 
-     */
-    constructor(element) {
-        super(element)
-    }
-}
 
 const player = new Player(document.querySelector("#joueur"));
 
@@ -124,11 +99,6 @@ function GenererPosition() {
     }
 }
 
-function getRandomArbitrary(min, max) {
-    return Math.random() * (max - min) + min;
-}
-
-
 // Fonction qui génère une direction aléatoire et fait bouger la boule
 function GenererDirection(p) {
 
@@ -186,19 +156,18 @@ window.addEventListener("keypress", (e) => {
 
     }
     if (e.key === "e") {
-        let divPlayer = document.querySelector("#joueur");
         player.speed = 10;
         let count = 0;
         let isBlue = false; // Permet d'alterner entre bleu clair et bleu foncé
 
         const interval = setInterval(() => {
-            divPlayer.style.backgroundColor = isBlue ? "blue" : "lightblue";
+            player.element.style.backgroundColor = isBlue ? "blue" : "lightblue";
             isBlue = !isBlue; // Alterne entre bleu et bleu clair
 
             count++;
             if (count >= 30) { // 30 cycles = 15 secondes (1 cycle = 500ms)
                 clearInterval(interval);
-                divPlayer.style.backgroundColor = "blue"; // Assure un retour en bleu à la fin
+                player.element.style.backgroundColor = "blue"; // Assure un retour en bleu à la fin
                 player.speed = 5; // Réinitialisation de la vitesse
             }
         }, 500); // Alterne toutes les 500ms pour 1s complète entre bleu et bleu clair

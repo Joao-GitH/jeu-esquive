@@ -1,10 +1,10 @@
-class Entity{
+export class Entity{
     
     /**
      * Creates an instance of Player.
      *
      * @constructor
-     * @param {HTMLDivElement} element 
+     * @param {HTMLImageElement} element 
      */
     constructor(element){
         this.element = element;
@@ -42,5 +42,8 @@ class Entity{
     }
     distance(){
         return Math.sqrt(Math.pow(this.x - this.target.x, 2) + Math.pow(this.y - this.target.y, 2))
+    }
+    getRandomArbitrary(min, max) {
+        return Math.random() * (max - min) + min;
     }
 }

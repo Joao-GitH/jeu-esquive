@@ -152,5 +152,6 @@ function movefireball(p) {
         p.x + p.width > player.x &&
         p.y < player.y + player.height &&
         p.y + p.height > player.y) {
+            p.element.remove()
     }
 }

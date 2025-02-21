@@ -141,7 +141,7 @@ function movefireball(p) {
         p.x += p.vector.x;
         p.y += p.vector.y;
     if (p.x < 0 || p.x > screen.width) {
-        pl.element.remove()
+        p.element.remove()
         return
     }
     if (p.y < 0 || p.y > screen.height) {
@@ -155,3 +155,38 @@ function movefireball(p) {
             p.element.remove()
     }
 }
+
+window.addEventListener("keypress", (e)=>{
+    console.log(e.key);
+    let posSourisX = posSourisXSpell
+    let posSourisY = posSourisYSpell
+    if (e.key == "f")
+    {
+        
+        player.x = posSourisX + ((player.x - posSourisX)/1.35);
+        player.y = posSourisY + ((player.y - posSourisY)/1.35);
+        
+
+        player.vector.x = 0;
+        player.vector.y = 0
+    }
+    if (e.key === "e") {
+        let divPlayer = document.querySelector("#joueur");
+        player.speed = 10;
+        let count = 0;
+        let isBlue = false; // Permet d'alterner entre bleu clair et bleu foncé
+    
+        const interval = setInterval(() => {
+            divPlayer.style.backgroundColor = isBlue ? "blue" : "lightblue";
+            isBlue = !isBlue; // Alterne entre bleu et bleu clair
+    
+            count++;
+            if (count >= 30) { // 30 cycles = 15 secondes (1 cycle = 500ms)
+                clearInterval(interval);
+                divPlayer.style.backgroundColor = "blue"; // Assure un retour en bleu à la fin
+                player.speed = 5; // Réinitialisation de la vitesse
+            }
+        }, 500); // Alterne toutes les 500ms pour 1s complète entre bleu et bleu clair
+    }
+    
+})

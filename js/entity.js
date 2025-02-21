@@ -10,7 +10,7 @@ class Entity{
         this.element = element;
         this.element.style.position = "absolute";
         this.vector = {x:0, y:0};
-        this.target = {x:0, y:0}
+        this.target = {x:this.x, y:this.y}
         this.speed = 5;
     }
 

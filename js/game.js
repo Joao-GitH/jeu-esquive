@@ -178,12 +178,12 @@ window.addEventListener("keypress", (e) => {
     let posSourisY = posSourisYSpell
     if (e.key == "f") {
 
+
         player.x = posSourisX + ((player.x - posSourisX) / 1.35);
         player.y = posSourisY + ((player.y - posSourisY) / 1.35);
+        player.target.x = player.x;
+        player.target.y = player.y;
 
-
-        player.vector.x = 0;
-        player.vector.y = 0
     }
     if (e.key === "e") {
         let divPlayer = document.querySelector("#joueur");

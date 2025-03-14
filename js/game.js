@@ -152,7 +152,7 @@ function movefireball(p) {
         if (underShield == false) {
             clearInterval(intervalScore)
             localStorage.score = score.textContent;
-            //window.location.href = 'gameOver.html';
+           // window.location.href = 'gameOver.html';
         }
         
     }
@@ -241,7 +241,7 @@ window.addEventListener("keypress", (e) => {
  */
 function trouverAngle(el1, el2) {
     const deltaX = el1.x - el2.x
-    const deltaY = el1.y - el2.y
+    const deltaY = el2.y - el1.y
     const angleBrute = Math.atan2(deltaX, deltaY)
     const angle = angleBrute * (180 / Math.PI);
     return angle

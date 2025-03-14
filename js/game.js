@@ -132,10 +132,10 @@ function movefireball(p) {
         p.element.remove()
         return
     }
-    if (p.x < player.x + player.width &&
-        p.x + p.width > player.x &&
-        p.y < player.y + player.height &&
-        p.y + p.height > player.y) {
+    if (p.x < player.x + player.width / 2 &&
+        p.x + p.width > player.x + player.width / 2 &&
+        p.y < player.y + player.height / 2 &&
+        p.y + p.height > player.y + player.height / 2) {
         p.element.remove()
     }
 }

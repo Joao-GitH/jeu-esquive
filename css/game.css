@@ -1,5 +1,9 @@
 .boule{
     background-color: red;
+    width: 300px;
+    height: 300px;
+    image-rendering: pixelated;
+    position: absolute;
 }
 body{
     overflow: hidden;
@@ -12,8 +16,5 @@ body{
     background-color: blue;
     width: 10vw;
     height: 10vw;
-    image-rendering: pixelated;
-}
-.boule{
     image-rendering: pixelated;
 }

@@ -73,9 +73,6 @@ function GenererBoule(p) {
     body.append(boule) // Ajout de la boule au body
 
     // Définition des styles de la boule
-    boule.style.height = "50px"
-    boule.style.width = "50px"
-    boule.style.position = "absolute"
     boule.style.top = `${p[1]}px` // Position verticale aléatoire
     boule.style.left = `${p[0]}px` // Position horizontale aléatoire
     let fireball = new Fireball(boule)
@@ -155,7 +152,7 @@ function movefireball(p) {
         if (underShield == false) {
             clearInterval(intervalScore)
             localStorage.score = score.textContent;
-            window.location.href = 'gameOver.html';
+            //window.location.href = 'gameOver.html';
         }
         
     }

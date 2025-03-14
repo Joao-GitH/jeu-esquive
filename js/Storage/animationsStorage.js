@@ -21,5 +21,5 @@ export class AnimationStorage{
 	static idleUpRight = new Animation("img/Player/Idle/right_up.png", 8);
 	static idleDownRight = new Animation("img/Player/Idle/right_down.png", 8);
 
-	static fireball = new Animation("img/fireballSpritesheet.png", 6);
+	static fireball = new Animation("img/Fireball/idle.png", 4);
 }

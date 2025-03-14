@@ -1,17 +1,28 @@
+import { Animation } from "../animation.js";
+import { EventArgs } from "../utilities/event.js";
 export class Entity{
-    
+    /** @type {Animation} */
+    currentAnimation;
     /**
-     * Creates an instance of Player.
+     * Creates an instance of Entity.
      *
      * @constructor
      * @param {HTMLImageElement} element 
+     * @param {Map<string, Animation>} [animations=new Map()]
      */
-    constructor(element){
+    constructor(element, animations = new Map()){
         this.element = element;
         this.element.style.position = "absolute";
         this.vector = {x:0, y:0};
         this.target = {x:this.x, y:this.y}
         this.speed = 5;
+        this.animations = animations;
+        
+		for (const [key, value] of this.animations) {
+			this.animations.set(key, value.clone());
+		}
+		this.#addEventFinishAnimations();
+		this.#initAnimations();
     }
 
     get x(){return parseInt(this.element.style.left)}
@@ -28,6 +39,58 @@ export class Entity{
 
     get center(){return {x:this.x + this.width / 2, y:this.y + this.height / 2}}
 
+	/** Initializes animations by setting up their frame change events. */
+	#initAnimations() {
+		for (const animation of this.animations.values()) {
+			animation.frameChange.add(this.#animationFrameChange);
+		}
+	}
+
+	/**
+	 * Handles the animation frame change event by updating the entity's sprite.
+	 *
+	 * @param {Animation} object - The animation object.
+	 * @param {EventArgs} e - The event arguments.
+	 */
+	#animationFrameChange = (object, e) => {
+		this.element.src = object.currentFrame.src;
+	};
+
+	/** Adds an event listener for animation finish events. */
+    #addEventFinishAnimations() {
+        for (const animation of this.animations.values()) {
+            animation.finish.add(this.#animationFinish);
+        }
+    }
+	/**
+	 * Handles the animation finish event.
+	 *
+	 * @param {Animation} object - The animation object.
+	 * @param {EventArgs} e - The event arguments.
+	 */
+	#animationFinish = (object, e) => {
+		if (!object.cancelable) this.updateAnimation();
+	};
+	/**
+     * Switches the current animation to the specified key.
+     * Stops the current animation if one is active.
+     *
+     * @param {string} key - The key of the animation to switch to.
+     * @throws {Error} If the animation key does not exist.
+     */
+    switchAnimation(key) {
+        const animation = this.animations.get(key);
+        if (animation === undefined) {
+            throw new Error(`There's no animation with the key: "${key}"`);
+        }
+        if (this.currentAnimation !== null && this.currentAnimation !== animation && this.currentAnimation.cancelable) {
+            this.currentAnimation.stop();
+        }
+        if (this.currentAnimation === null || !this.currentAnimation.playing) {
+            animation.start();
+            this.currentAnimation = animation;
+        }
+    }
     magnitude() {
         return Math.sqrt(this.vector.x * this.vector.x + this.vector.y * this.vector.y);
     }
@@ -46,4 +109,5 @@ export class Entity{
     getRandomArbitrary(min, max) {
         return Math.random() * (max - min) + min;
     }
+	updateAnimation() { }
 }

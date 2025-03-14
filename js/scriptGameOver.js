@@ -3,67 +3,62 @@ let closebtn = document.getElementById("closebtn");
 
 // To acces the popup element
 let popup = document.querySelector(".popup");
-let scoreUser = 0
+let scoreUser = Number(localStorage.score);
 let main = document.querySelector("main")
 
 document.addEventListener("DOMContentLoaded", (event) => {
     popup.style.display = "block";
     document.body.style.backgroundColor = "#9EA9B1";
-    //let scoreUser = localStorage.score;
-    scoreUser = 200;
 });
 
 let affichageScore = document.querySelector("#affichageScore")
 affichageScore.textContent = localStorage.score
 
 // To close the popup on click
-closebtn.addEventListener("click", async () => {
-    let pseudo = document.querySelector("#pseudo")
+closebtn.addEventListener("click", () => {
+    console.log("cliqué");
+    let pseudo = document.querySelector("#pseudo");
+    
     if (pseudo.value == "") {
         let affichageErreurs = document.querySelector("#erreurs");
-        affichageErreurs.innerText = "Vous êtes obligez de mettre un nom";
-    }
-    else {
-        let pseudoValider = pseudo.value
+        affichageErreurs.innerText = "Vous êtes obligé de mettre un nom";
+    } else {
+        let pseudoValider = pseudo.value;
         fetch("./backend/api.php", {
             method: "POST",
             body: JSON.stringify({
-                username: pseudo.value,  // Corrigé ici
-                score: scoreUser         // Corrigé ici
+                username: pseudoValider,  // Corrected here
+                score: scoreUser          // Corrected here
             }),
             headers: {
                 "Content-type": "application/json; charset=UTF-8"
             }
         })
-            .then((reponse) => reponse.json())
-            .then((retourJson) => console.log(retourJson))
-            .catch((error) => console.error("Erreur lors de la requête :", error)).then(() => {
-                popup.style.display = "none";
-                document.body.style.backgroundColor = "white";
-                fetch('./backend/api.php')
-                    .then((response) => {
-                        if (!response.ok) {
-                            throw new Error(`Erreur HTTP ! statut : ${response.status}`);
-                        }
-                        return response.json();
-                    })
-                    .then((data) => {
-                        console.log(data)
-                        genererClassement(data)
-                        let btnMenu = document.createElement("a")
-                        btnMenu.innerText = "Retourner à l'accueil";
-                        btnMenu.href = "index.html"
-                        main.appendChild(btnMenu);
-
-                    })
-                    .catch((error) => {
-                        console.error('Erreur lors de la lecture du fichier JSON :', error);
-                    });
-            });
-
+        .then((reponse) => {
+            // Check if the response is ok (status code 200)
+            if (!reponse.ok) {
+                throw new Error(`HTTP error! Status: ${reponse.status}`);
+            }
+            return reponse.text();  // Get the response as text first
+        })
+        .then((responseText) => {
+            console.log("Response Text:", responseText); // Log the raw response text
+            try {
+                // Attempt to parse the response as JSON
+                const jsonResponse = JSON.parse(responseText);
+                window.location.href = 'index.html';
+            } catch (error) {
+                // Handle any errors that occur during JSON parsing
+                console.error("Failed to parse JSON:", error);
+            }
+        })
+        .catch((error) => {
+            // Catch any errors in the fetch process
+            console.error("Fetch error:", error);
+        });
     }
-
 });
+
 
 function genererClassement(data) {
 

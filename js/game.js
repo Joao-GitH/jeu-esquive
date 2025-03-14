@@ -4,6 +4,21 @@ import { Player, Fireball } from "./Entities/entities.js";
 
 const player = new Player(document.querySelector("#joueur"));
 
+let score = document.querySelector("#score")
+score.textContent = "0"
+let intervalScore = setInterval(()=>{
+    score.textContent = Number(score.textContent) + Number(1);
+}, 1000)
+score.style.position = "absolute"
+score.style.left = screen.width/2 + "px";
+score.style.top = "10px"
+
+let underghost = false;
+let underShield = false;
+let cdShield = 0;
+let cdFlash = 0;
+let cdGhost = 0;
+
 let mouseDown = false;
 addEventListener("mouseup", () => mouseDown = false)
 addEventListener("mousedown", (e) => {
@@ -136,11 +151,13 @@ function movefireball(p) {
         p.x + p.width > player.x + player.width / 2 &&
         p.y < player.y + player.height / 2 &&
         p.y + p.height > player.y + player.height / 2) {
+        p.element.remove()
         if (underShield == false) {
             clearInterval(intervalScore)
             localStorage.score = score.textContent;
             window.location.href = 'gameOver.html';
         }
+        
     }
 }
 
@@ -159,29 +176,62 @@ window.addEventListener("keypress", (e) => {
     let posSourisY = posSourisYSpell
     if (e.key == "f") {
 
+        if (cdFlash == 0)
+        {
+            cdFlash = 15000;
+            player.x = posSourisX + ((player.x - posSourisX) / 1.35);
+            player.y = posSourisY + ((player.y - posSourisY) / 1.35);
+            player.target.x = player.x;
+            player.target.y = player.y;
+            let timeoutCd = setTimeout((e)=>{
+                cdFlash = 0;
+            }, cdFlash)
+        }
 
-        player.x = posSourisX + ((player.x - posSourisX) / 1.35);
-        player.y = posSourisY + ((player.y - posSourisY) / 1.35);
-        player.target.x = player.x;
-        player.target.y = player.y;
 
     }
     if (e.key === "e") {
-        player.speed = 10;
-        let count = 0;
-        let isBlue = false; // Permet d'alterner entre bleu clair et bleu foncé
+        if (underghost == false)
+        {
+            underghost = true
+            cdGhost = 15000;
+            player.speed = 10;
+            let count = 0;
+            let isBlue = false; // Permet d'alterner entre bleu clair et bleu foncé
+    
+            const interval = setInterval(() => {
+                player.element.style.backgroundColor = isBlue ? "blue" : "lightblue";
+                isBlue = !isBlue; // Alterne entre bleu et bleu clair
+    
+                count++;
+                if (count >= 30) { // 30 cycles = 15 secondes (1 cycle = 500ms)
+                    clearInterval(interval);
+                    player.element.style.backgroundColor = "blue"; // Assure un retour en bleu à la fin
+                    player.speed = 5; // Réinitialisation de la vitesse
+                    let timeoutCd = setTimeout((e) =>{
+                        underghost = false
+                    }, cdGhost)
+                }
+            }, 500); // Alterne toutes les 500ms pour 1s complète entre bleu et bleu clair
+        }
 
-        const interval = setInterval(() => {
-            player.element.style.backgroundColor = isBlue ? "blue" : "lightblue";
-            isBlue = !isBlue; // Alterne entre bleu et bleu clair
+    }
+    if (e.key === "d")
+    {
+        if (cdShield == 0)
+        {
+            underShield = true;
+            cdShield = 15000
+            player.element.style.border = "solid grey 3px"
+            let timeout = setTimeout((e) =>{
+                player.element.style.border = "none"
+                underShield = false;
+            }, 3000)
+            let timeoutCd = setTimeout((e) =>{
+                cdShield = 0;
+            },cdShield)
+        }
 
-            count++;
-            if (count >= 30) { // 30 cycles = 15 secondes (1 cycle = 500ms)
-                clearInterval(interval);
-                player.element.style.backgroundColor = "blue"; // Assure un retour en bleu à la fin
-                player.speed = 5; // Réinitialisation de la vitesse
-            }
-        }, 500); // Alterne toutes les 500ms pour 1s complète entre bleu et bleu clair
     }
 
 })

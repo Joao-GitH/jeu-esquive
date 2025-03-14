@@ -36,7 +36,7 @@ function move() {
         player.vector.y *= player.speed;
     }
     else
-        player.vector = {x:0, y:0};
+        player.vector = { x: 0, y: 0 };
     player.updateAnimation();
     requestAnimationFrame(move);
 }
@@ -108,14 +108,14 @@ function GenererPosition() {
  */
 function GenererDirection(p) {
 
-    p.target.x = player.x + player.width / 2 
+    p.target.x = player.x + player.width / 2
     p.target.y = player.y + player.height / 2
     p.vector.x = p.target.x - p.x;
     p.vector.y = p.target.y - p.y;
     p.normalize();
     p.vector.x *= p.speed;
     p.vector.y *= p.speed;
-    p.element.style.transform = `rotate(${trouverAngle(p,player)}deg)`;
+    p.element.style.transform = `rotate(${trouverAngle(p, player)}deg)`;
     setInterval(() => {
         movefireball(p)
     }, 1000 / 60); // Rafraîchissement rapide pour un mouvement fluide
@@ -136,7 +136,11 @@ function movefireball(p) {
         p.x + p.width > player.x + player.width / 2 &&
         p.y < player.y + player.height / 2 &&
         p.y + p.height > player.y + player.height / 2) {
-        location.href = "gameOver.html"
+        if (underShield == false) {
+            clearInterval(intervalScore)
+            localStorage.score = score.textContent;
+            window.location.href = 'gameOver.html';
+        }
     }
 }
 
@@ -188,10 +192,10 @@ window.addEventListener("keypress", (e) => {
  * @param {Fireball} el1 
  * @param {Player} el2 
  */
-function trouverAngle(el1,el2){
+function trouverAngle(el1, el2) {
     const deltaX = el2.x - el1.x
-    const deltaY = el2.y -el1.y
-    const angleBrute = Math.atan2(deltaY,deltaX)
+    const deltaY = el2.y - el1.y
+    const angleBrute = Math.atan2(deltaY, deltaX)
     const angle = angleBrute * (180 / Math.PI);
     return angle
 }

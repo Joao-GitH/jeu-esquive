@@ -2,15 +2,15 @@ import { AnimationStorage } from "./Storage/animationsStorage.js";
 import { Player, Fireball } from "./Entities/entities.js";
 
 
-const player = new Player(document.querySelector("#joueur"));
+const player = new Player(document.querySelector("#joueur"), { width: 60, height: 63, offsetX: 70, offsetY: 68});
 
 let score = document.querySelector("#score")
 score.textContent = "0"
-let intervalScore = setInterval(()=>{
+let intervalScore = setInterval(() => {
     score.textContent = Number(score.textContent) + Number(1);
 }, 1000)
 score.style.position = "absolute"
-score.style.left = screen.width/2 + "px";
+score.style.left = screen.width / 2 + "px";
 score.style.top = "10px"
 
 let underghost = false;
@@ -75,7 +75,7 @@ function GenererBoule(p) {
     // Définition des styles de la boule
     boule.style.top = `${p[1]}px` // Position verticale aléatoire
     boule.style.left = `${p[0]}px` // Position horizontale aléatoire
-    let fireball = new Fireball(boule)
+    let fireball = new Fireball(boule, { width: 75, height: 42, offsetX: 112, offsetY: 129 })
     GenererDirection(fireball) // Démarre le mouvement de la boule
 }
 
@@ -144,18 +144,25 @@ function movefireball(p) {
         p.element.remove()
         return
     }
-    if (p.center.x < player.x + player.width / 2 &&
-        p.center.x + p.width > player.x + player.width / 2 &&
-        p.center.y < player.y + player.height / 2 &&
-        p.center.y + p.height > player.y + player.height / 2) {
-        p.element.remove()
-        if (underShield == false) {
-            clearInterval(intervalScore)
-            localStorage.score = score.textContent;
-           // window.location.href = 'gameOver.html';
+
+    // Assuming player has width and height properties (for example, player.width and player.height)
+    if (
+        p.center.x < player.x + player.hitbox.offsetX + player.center.x + player.width &&
+        p.center.x + p.hitbox.offsetX > player.x + player.hitbox.offsetX + player.center.x &&
+        p.center.y < player.y + player.hitbox.offsetY + player.center.y + player.height &&
+        p.center.y + p.hitbox.offsetX > player.y + player.hitbox.offsetY + player.center.y
+    ) {
+        p.element.remove();  // Remove the fireball element
+
+        // Check if the player is under shield
+        if (underShield === false) {
+            clearInterval(intervalScore);  // Stop the score interval
+            localStorage.score = score.textContent;  // Save the score to localStorage
+            // Uncomment this line if you want to redirect the player to the Game Over screen
+            // window.location.href = 'gameOver.html';
         }
-        
     }
+
 }
 
 let posSourisXSpell = 0;
@@ -173,14 +180,13 @@ window.addEventListener("keypress", (e) => {
     let posSourisY = posSourisYSpell
     if (e.key == "f") {
 
-        if (cdFlash == 0)
-        {
+        if (cdFlash == 0) {
             cdFlash = 15000;
             player.x = posSourisX + ((player.x - posSourisX) / 1.35);
             player.y = posSourisY + ((player.y - posSourisY) / 1.35);
             player.target.x = player.x;
             player.target.y = player.y;
-            let timeoutCd = setTimeout((e)=>{
+            let timeoutCd = setTimeout((e) => {
                 cdFlash = 0;
             }, cdFlash)
         }
@@ -188,23 +194,22 @@ window.addEventListener("keypress", (e) => {
 
     }
     if (e.key === "e") {
-        if (underghost == false)
-        {
+        if (underghost == false) {
             underghost = true
             cdGhost = 15000;
             player.speed = 10;
             let count = 0;
             let isBlue = false; // Permet d'alterner entre bleu clair et bleu foncé
-    
+
             const interval = setInterval(() => {
                 player.element.style.backgroundColor = isBlue ? "blue" : "lightblue";
                 isBlue = !isBlue; // Alterne entre bleu et bleu clair
-    
+
                 count++;
                 if (count >= 30) { // 30 cycles = 15 secondes (1 cycle = 500ms)
                     clearInterval(interval);
                     player.speed = 5; // Réinitialisation de la vitesse
-                    let timeoutCd = setTimeout((e) =>{
+                    let timeoutCd = setTimeout((e) => {
                         underghost = false
                     }, cdGhost)
                 }
@@ -212,20 +217,18 @@ window.addEventListener("keypress", (e) => {
         }
 
     }
-    if (e.key === "d")
-    {
-        if (cdShield == 0)
-        {
+    if (e.key === "d") {
+        if (cdShield == 0) {
             underShield = true;
             cdShield = 15000
             player.element.style.border = "solid grey 3px"
-            let timeout = setTimeout((e) =>{
+            let timeout = setTimeout((e) => {
                 player.element.style.border = "none"
                 underShield = false;
             }, 3000)
-            let timeoutCd = setTimeout((e) =>{
+            let timeoutCd = setTimeout((e) => {
                 cdShield = 0;
-            },cdShield)
+            }, cdShield)
         }
 
     }

@@ -8,15 +8,25 @@ export class Entity{
      *
      * @constructor
      * @param {HTMLImageElement} element 
+     * @param {{ width:number ,height:number, offsetX:number, offsetY:number}} hitbox
      * @param {Map<string, Animation>} [animations=new Map()]
      */
-    constructor(element, animations = new Map()){
+    constructor(element, hitbox ,animations = new Map()){
         this.element = element;
         this.element.style.position = "absolute";
         this.vector = {x:0, y:0};
         this.target = {x:this.x, y:this.y}
         this.speed = 5;
         this.animations = animations;
+        this.hitbox = hitbox;
+
+        this.hitboxElement = document.createElement("div");
+        this.hitboxElement.style.width = `${hitbox.width}px`;
+        this.hitboxElement.style.height = `${hitbox.height}px`;
+        this.hitboxElement.classList.add("hitbox");
+        document.body.append(this.hitboxElement);
+
+        
         
 		for (const [key, value] of this.animations) {
 			this.animations.set(key, value.clone());
@@ -26,10 +36,10 @@ export class Entity{
     }
 
     get x(){return parseInt(this.element.style.left)}
-    set x(value){this.element.style.left = `${value}px`}
+    set x(value){this.element.style.left = `${value}px`; this.hitboxElement.style.left = `${value + this.hitbox.offsetX}px`;}
 
     get y(){return parseInt(this.element.style.top)}
-    set y(value){this.element.style.top = `${value}px`}
+    set y(value){this.element.style.top = `${value}px`; this.hitboxElement.style.top = `${value + this.hitbox.offsetY}px`;}
 
     get width(){return this.element.getBoundingClientRect().width}
     set width(value){this.element.style.width = `${value}px`}

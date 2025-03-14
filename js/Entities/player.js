@@ -9,9 +9,10 @@ export class Player extends Entity {
      *
      * @constructor
      * @param {HTMLImageElement} element 
+     * @param {{ width:number ,height:number, offsetX:number, offsetY:number}} hitbox
      */
-    constructor(element) {
-        super(element, new Map([
+    constructor(element, hitbox) {
+        super(element, hitbox,new Map([
             ["idle-down", AnimationStorage.idleDown],
 			["idle-down-right", AnimationStorage.idleDownRight],
 			["idle-down-left", AnimationStorage.idleDownLeft],

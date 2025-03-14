@@ -7,9 +7,10 @@ export class Fireball extends Entity {
      *
      * @constructor
      * @param {HTMLImageElement} element 
+     * @param {{ width:number ,height:number, offsetX:number, offsetY:number}} hitbox
      */
-    constructor(element) {
-        super(element, new Map([
+    constructor(element,hitbox) {
+        super(element, hitbox,new Map([
             ["idle", AnimationStorage.fireball]
         ]))
         this.speed = this.getRandomArbitrary(5, 10)

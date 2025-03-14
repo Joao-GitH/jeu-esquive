@@ -136,7 +136,7 @@ function movefireball(p) {
         p.x + p.width > player.x + player.width / 2 &&
         p.y < player.y + player.height / 2 &&
         p.y + p.height > player.y + player.height / 2) {
-        p.element.remove()
+        location.href = "gameOver.html"
     }
 }
 

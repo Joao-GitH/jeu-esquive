@@ -13,7 +13,8 @@ document.addEventListener("DOMContentLoaded", (event) => {
     scoreUser = 200;
 });
 
-
+let affichageScore = document.querySelector("#affichageScore")
+affichageScore.textContent = localStorage.score
 
 // To close the popup on click
 closebtn.addEventListener("click", async () => {

@@ -33,7 +33,7 @@ p {
 .popup {
     background-color: #fafafa;
     width: 366px;
-    height: 222px;
+    height: 40vh;
     border-radius: 26px;
     text-align: center;
     display: none;

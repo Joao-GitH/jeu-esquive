@@ -3,6 +3,17 @@ import { Player, Fireball } from "./Entities/entities.js";
 
 
 const player = new Player(document.querySelector("#joueur"));
+
+let score = document.querySelector("#score")
+score.textContent = "0"
+let intervalScore = setInterval(()=>{
+    score.textContent = Number(score.textContent) + Number(1);
+}, 1000)
+score.style.position = "absolute"
+score.style.left = screen.width/2 + "px";
+score.style.top = "10px"
+//position: absolute;top:250px;left:250px;
+
 let underghost = false;
 let underShield = false;
 let cdShield = 0;
@@ -134,6 +145,12 @@ function movefireball(p) {
         p.x + p.width > player.x &&
         p.y < player.y + player.height &&
         p.y + p.height > player.y) {
+        if (underShield == false)
+        {
+            clearInterval(intervalScore)
+            localStorage.score = score.textContent;
+            window.location.href = 'gameOver.html'; 
+        }
         p.element.remove()
     }
 }
@@ -199,7 +216,7 @@ window.addEventListener("keypress", (e) => {
         {
             underShield = true;
             cdShield = 15000
-            player.element.style.border = "solid black 3px"
+            player.element.style.border = "solid grey 3px"
             let timeout = setTimeout((e) =>{
                 player.element.style.border = "none"
                 underShield = false;

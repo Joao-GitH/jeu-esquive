@@ -203,7 +203,6 @@ window.addEventListener("keypress", (e) => {
                 count++;
                 if (count >= 30) { // 30 cycles = 15 secondes (1 cycle = 500ms)
                     clearInterval(interval);
-                    player.element.style.backgroundColor = "blue"; // Assure un retour en bleu à la fin
                     player.speed = 5; // Réinitialisation de la vitesse
                     let timeoutCd = setTimeout((e) =>{
                         underghost = false

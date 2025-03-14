@@ -40,8 +40,8 @@ function movePlayer(e) {
 }
 
 function move() {
-    if (!(player.target.x >= player.x && player.target.x <= player.width + player.x
-        && player.target.y >= player.y && player.target.y <= player.height + player.y)) {
+    if (!(player.target.x >= player.center.x && player.target.x <= player.width - player.center.x
+        && player.target.y >= player.center.y && player.target.y <= player.height - player.center.y)) {
         player.x += player.vector.x;
         player.y += player.vector.y;
         player.vector.x = player.target.x - player.center.x;
@@ -144,10 +144,10 @@ function movefireball(p) {
         p.element.remove()
         return
     }
-    if (p.x < player.x + player.width / 2 &&
-        p.x + p.width > player.x + player.width / 2 &&
-        p.y < player.y + player.height / 2 &&
-        p.y + p.height > player.y + player.height / 2) {
+    if (p.center.x < player.x + player.width / 2 &&
+        p.center.x + p.width > player.x + player.width / 2 &&
+        p.center.y < player.y + player.height / 2 &&
+        p.center.y + p.height > player.y + player.height / 2) {
         p.element.remove()
         if (underShield == false) {
             clearInterval(intervalScore)

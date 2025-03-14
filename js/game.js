@@ -243,8 +243,8 @@ window.addEventListener("keypress", (e) => {
  * @param {Player} el2 
  */
 function trouverAngle(el1, el2) {
-    const deltaX = el2.x - el1.x
-    const deltaY = el2.y - el1.y
+    const deltaX = el1.x - el2.x
+    const deltaY = el1.y - el2.y
     const angleBrute = Math.atan2(deltaY, deltaX)
     const angle = angleBrute * (180 / Math.PI);
     return angle

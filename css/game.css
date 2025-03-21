@@ -23,3 +23,9 @@ body{
     background-color: rgba(0, 0, 255, 0.445);
     position: absolute;
 }
+body{
+    background-image: url("https://cdn.gamedevmarket.net/wp-content/uploads/20191203145249/4779a7547f510ddb98a89edda4df3c78.png");
+    background-size: cover;  /* Ajuste l'image pour couvrir toute la fenêtre */
+    background-repeat: no-repeat; /* Empêche la répétition */
+    background-position: center center; /* Centre l'image */
+}

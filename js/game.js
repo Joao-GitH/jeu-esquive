@@ -1,17 +1,23 @@
 import { AnimationStorage } from "./Storage/animationsStorage.js";
-import { Player, Fireball } from "./Entities/entities.js";
+import { Player, Fireball, Entity } from "./Entities/entities.js";
+import { PhysicsWorld, RectangleCollider as Rect, RectangleCollider, Vector } from "./PhysicsEngine/PhysicsEngine.js";
 
-const player = new Player(document.querySelector("#joueur"), { width: 60, height: 63, offsetX: 70, offsetY: 68 });
 
-let score = document.querySelector("#score");
-score.textContent = "0";
-score.style.position = "absolute";
-score.style.left = screen.width / 2 + "px";
-score.style.top = "10px";
+const world = new PhysicsWorld(document.createElement("canvas").getContext("2d"));
+const player = new Player(document.querySelector("#joueur"), new Rect(0,0, 60, 63), {x: 70, y: 68});
+/** @type {Entity[]} */
+const entities = [player];
+world.addColliders(player.collider)
 
+/** @type {HTMLParagraphElement} */
+let score = document.querySelector("#score")
+score.textContent = "0"
 let intervalScore = setInterval(() => {
-    score.textContent = Number(score.textContent) + 1;
-}, 1000);
+    score.textContent = (Number(score.textContent) + Number(1)).toString();
+}, 1000)
+score.style.position = "absolute"
+score.style.left = screen.width / 2 + "px";
+score.style.top = "10px"
 
 let underghost = false;
 let underShield = false;
@@ -20,211 +26,194 @@ let cdFlash = 0;
 let cdGhost = 0;
 
 let mouseDown = false;
-addEventListener("mouseup", () => mouseDown = false);
+addEventListener("mouseup", () => mouseDown = false)
 addEventListener("mousedown", (e) => {
-    mouseDown = true;
-    movePlayer(e);
-});
-addEventListener("contextmenu", e => e.preventDefault());
-window.addEventListener("mousemove", movePlayer);
+    mouseDown = true
+    setPlayerTarget(e);
+})
+addEventListener("contextmenu", e => e.preventDefault())
+window.addEventListener("mousemove", setPlayerTarget);
 
-function movePlayer(e) {
+function setPlayerTarget(e) {
     if (mouseDown) {
-        player.target.x = e.clientX;
-        player.target.y = e.clientY;
-        player.vector.x = player.target.x - player.center.x;
-        player.vector.y = player.target.y - player.center.y;
-        player.normalize();
-        player.vector.x *= player.speed;
-        player.vector.y *= player.speed;
+        player.target.x = e.clientX
+        player.target.y = e.clientY
     }
 }
-
-function move() {
-    if (!(player.target.x >= player.center.x && player.target.x <= player.width - player.center.x
-        && player.target.y >= player.center.y && player.target.y <= player.height - player.center.y)) {
-        player.x += player.vector.x;
-        player.y += player.vector.y;
-        player.vector.x = player.target.x - player.center.x;
-        player.vector.y = player.target.y - player.center.y;
-        player.normalize();
-        player.vector.x *= player.speed;
-        player.vector.y *= player.speed;
-    } else {
-        player.vector = { x: 0, y: 0 };
-    }
-    player.updateAnimation();
-    requestAnimationFrame(move);
-}
-move();
+const start = Date.now();
+setInterval(() => {
+    main(Date.now() - start)
+}, 1000 / 60)
 
 // Fonction principale qui démarre la génération des boules
-function Main() {
+//player.collider.collide.add(() => {alert("a")})
+function main(timepassed) {
+    world.update();
+    player.setVelocityToTarget();
+    player.updateAnimation();
+    for (const entity of entities) {
+        entity.draw();
+    }
     function spawnLoop() {
         GenererBoule(GenererPosition());
         let interval = Math.max(300, 1000 / getDifficulty());
         setTimeout(spawnLoop, interval);
     }
-    spawnLoop();
-}
-Main();
-
-// Fonction pour générer une position aléatoire sur les bords de l'écran
-function GenererPosition() {
-    let choixPosition = Math.floor(Math.random() * 2);
-    if (choixPosition == 1) {
-        let positionX = Math.floor(Math.random() * screen.width);
-        if (positionX > screen.width - 150) {
-            let positionY = Math.floor(Math.random() * screen.height);
-            return [positionX, positionY];
-        }
-        let choixPositionY = Math.floor(Math.random() * 2);
-        let positionY = choixPositionY === 1 ? screen.height : 1;
-        return [positionX, positionY];
-    } else {
-        let positionY = Math.floor(Math.random() * screen.height);
-        let choixPositionX = Math.floor(Math.random() * 2);
-        if (positionY > screen.height - 50) {
-            let positionX = Math.floor(Math.random() * screen.width);
-            return [positionX, positionY];
-        }
-        let positionX = choixPositionX === 1 ? screen.width : 1;
-        return [positionX, positionY];
+    if(timepassed % 500 < 10){
+        return new Promise((resolve) => {
+            if (score.textContent == (180).toString()) {
+                setTimeout(() => {
+                    spawnLoop();
+                    resolve()
+                }, 1)
+            }
+            else{
+                setTimeout(() => {
+                    spawnLoop();
+                    resolve()
+                }, 1000 - Number(score.textContent) * 100)
+            }
+        });
     }
 }
-
-// Génère une boule et lance sa direction
-function GenererBoule(p) {
-    let boule = document.createElement("img");
-    boule.classList.add("boule");
-    document.body.append(boule);
-    boule.style.top = `${p[1]}px`;
-    boule.style.left = `${p[0]}px`;
-    let fireball = new Fireball(boule, { width: 75, height: 42, offsetX: 112, offsetY: 129 });
-    GenererDirection(fireball);
-}
-
 // Calcule la difficulté en fonction du score
 function getDifficulty() {
     let currentScore = Number(score.textContent);
     return 1 + currentScore /60 ;
 }
+// Fonction pour générer une boule à une position donnée
+function GenererBoule(p) {
+    let boule = document.createElement("img") // Création d'un élément div
+    boule.classList.add("boule") // Ajout d'une classe CSS pour le style
+    let body = document.querySelector("body") // Sélection du corps de la page
+    body.append(boule) // Ajout de la boule au body
 
+    // Définition des styles de la boule
+    let fireball = new Fireball(boule, new Rect(p[1],p[0],40,40), {x: 117, y: 129 })
+    world.addColliders(fireball.collider);
+    entities.push(fireball);
+    GenererDirection(fireball) // Démarre le mouvement de la boule
+}
+
+// Fonction pour générer une position aléatoire sur les bords de l'écran
+function GenererPosition() {
+    let choixPosition = Math.floor(Math.random() * 2) // Choisir entre X ou Y comme point de départ
+    if (choixPosition == 1) {
+        let positionX = Math.floor(Math.random() * screen.width)
+        if (positionX > screen.width - 150) {
+            let positionY = Math.floor(Math.random() * screen.height)
+            return [positionX, positionY]
+        }
+        let choixPositionY = Math.floor(Math.random() * 2)
+        if (choixPositionY == 1) {
+            let positionY = screen.height
+            return [positionX, positionY]
+        } else {
+            let positionY = 1
+            return [positionX, positionY]
+        }
+    } else {
+        let positionY = Math.floor(Math.random() * screen.height)
+        let choixPositionX = Math.floor(Math.random() * 2)
+        if (positionY > screen.height - 50) {
+            let positionX = Math.floor(Math.random() * screen.width)
+            return [positionX, positionY]
+        }
+        if (choixPositionX == 1) {
+            let positionX = screen.width
+            return [positionX, positionY]
+        } else {
+            let positionX = 1
+            return [positionX, positionY]
+        }
+    }
+}
+
+// 
 /**
  * Fonction qui génère une direction aléatoire et fait bouger la boule
  * @param {Fireball} p 
  */
 function GenererDirection(p) {
-    p.target.x = player.x + player.width / 2;
-    p.target.y = player.y + player.height / 2;
-    p.vector.x = p.target.x - p.x;
-    p.vector.y = p.target.y - p.y;
-    p.normalize();
-
-    // Augmentation de la vitesse avec la difficulté
-    let difficulty = getDifficulty();
-    p.vector.x *= p.speed * difficulty;
-    p.vector.y *= p.speed * difficulty;
-
+    p.target.x = player.collider.center.x;
+    p.target.y = player.collider.center.y;
+    p.setVelocityToTarget();
     p.element.style.transform = `rotate(${trouverAngle(p, player)}deg)`;
-
-    setInterval(() => {
-        movefireball(p);
-    }, 1000 / 60);
 }
 
-/** @param {Fireball} p  */
-function movefireball(p) {
-    p.x += p.vector.x;
-    p.y += p.vector.y;
-    if (p.x < 0 || p.x > screen.width || p.y < 0 || p.y > screen.height) {
-        p.element.remove();
-        return;
-    }
 
-    if (
-        p.center.x < player.x + player.hitbox.offsetX + player.center.x + player.width &&
-        p.center.x + p.hitbox.offsetX > player.x + player.hitbox.offsetX + player.center.x &&
-        p.center.y < player.y + player.hitbox.offsetY + player.center.y + player.height &&
-        p.center.y + p.hitbox.offsetX > player.y + player.hitbox.offsetY + player.center.y
-    ) {
-        p.element.remove();
-
-        if (underShield === false) {
-            //clearInterval(intervalScore);
-            localStorage.score = score.textContent;
-            // window.location.href = 'gameOver.html';
-        }
-    }
-}
-
-let posSourisXSpell = 0;
-let posSourisYSpell = 0;
-
-document.addEventListener('mousemove', function (event) {
-    posSourisXSpell = event.clientX;
-    posSourisYSpell = event.clientY;
-});
 
 window.addEventListener("keypress", (e) => {
-    let posSourisX = posSourisXSpell;
-    let posSourisY = posSourisYSpell;
+    console.log(e.key);
+    let posSourisX = player.target.x;
+    let posSourisY = player.target.y;
+    if (e.key == "f") {
 
-    if (e.key === "f") {
-        if (cdFlash === 0) {
+        if (cdFlash == 0) {
             cdFlash = 15000;
-            player.x = posSourisX + ((player.x - posSourisX) / 1.35);
-            player.y = posSourisY + ((player.y - posSourisY) / 1.35);
-            player.target.x = player.x;
-            player.target.y = player.y;
-            setTimeout(() => cdFlash = 0, cdFlash);
+            player.collider.x = posSourisX + ((player.collider.x - posSourisX) / 1.35);
+            player.collider.y = posSourisY + ((player.collider.y - posSourisY) / 1.35);
+            player.target.x = player.collider.x;
+            player.target.y = player.collider.y;
+            let timeoutCd = setTimeout((e) => {
+                cdFlash = 0;
+            }, cdFlash)
         }
-    }
 
+
+    }
     if (e.key === "e") {
-        if (!underghost) {
-            underghost = true;
+        if (underghost == false) {
+            underghost = true
             cdGhost = 15000;
             player.speed = 10;
             let count = 0;
-            let isBlue = false;
+            let isBlue = false; // Permet d'alterner entre bleu clair et bleu foncé
 
             const interval = setInterval(() => {
                 player.element.style.backgroundColor = isBlue ? "blue" : "lightblue";
-                isBlue = !isBlue;
+                isBlue = !isBlue; // Alterne entre bleu et bleu clair
+
                 count++;
-                if (count >= 30) {
+                if (count >= 30) { // 30 cycles = 15 secondes (1 cycle = 500ms)
                     clearInterval(interval);
-                    player.speed = 5;
-                    setTimeout(() => underghost = false, cdGhost);
+                    player.speed = 5; // Réinitialisation de la vitesse
+                    let timeoutCd = setTimeout((e) => {
+                        underghost = false
+                    }, cdGhost)
                 }
-            }, 500);
+            }, 500); // Alterne toutes les 500ms pour 1s complète entre bleu et bleu clair
         }
+
+    }
+    if (e.key === "d") {
+        if (cdShield == 0) {
+            underShield = true;
+            cdShield = 15000
+            player.element.style.border = "solid grey 3px"
+            let timeout = setTimeout((e) => {
+                player.element.style.border = "none"
+                underShield = false;
+            }, 3000)
+            let timeoutCd = setTimeout((e) => {
+                cdShield = 0;
+            }, cdShield)
+        }
+
     }
 
-    if (e.key === "d") {
-        if (cdShield === 0) {
-            underShield = true;
-            cdShield = 15000;
-            player.element.style.border = "solid grey 3px";
-            setTimeout(() => {
-                player.element.style.border = "none";
-                underShield = false;
-            }, 3000);
-            setTimeout(() => cdShield = 0, cdShield);
-        }
-    }
-});
+})
+
 
 /**
- * génère un angle
+ * genere un angle
  * @param {Fireball} el1 
  * @param {Player} el2 
  */
 function trouverAngle(el1, el2) {
-    const deltaX = el1.x - el2.x;
-    const deltaY = el2.y - el1.y;
-    const angleBrute = Math.atan2(deltaX, deltaY);
+    const deltaX = el1.collider.x - el2.collider.x
+    const deltaY = el2.collider.y - el1.collider.y
+    const angleBrute = Math.atan2(deltaX, deltaY)
     const angle = angleBrute * (180 / Math.PI);
-    return angle;
+    return angle
 }

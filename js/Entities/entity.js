@@ -1,6 +1,5 @@
 import { Animation } from "../animation.js";
-import { EventArgs } from "../utilities/event.js";
-import { RectangleCollider } from "../PhysicsEngine/PhysicsEngine.js";
+import { CircleCollider, RectangleCollider, Event, Vector } from "../PhysicsEngine/PhysicsEngine.js";
 export class Entity{
     /** @type {Animation} */
     currentAnimation;
@@ -16,8 +15,7 @@ export class Entity{
     constructor(element, collider, offset, animations = new Map()){
         this.element = element;
         this.element.style.position = "absolute";
-        this.vector = {x:0, y:0};
-        this.target = {x:this.x, y:this.y}
+        this.target = new CircleCollider(collider.x, collider.y, 10)
         this.speed = 5;
         this.animations = animations;
         this.collider = collider;
@@ -27,40 +25,19 @@ export class Entity{
         this.hitboxElement.style.height = `${collider.height}px`;
         this.hitboxElement.classList.add("hitbox");
         document.body.append(this.hitboxElement);
-
-        
-        
 		for (const [key, value] of this.animations) {
 			this.animations.set(key, value.clone());
 		}
 		this.#addEventFinishAnimations();
 		this.#initAnimations();
     }
-
-    get x(){ if(this.collider) return this.collider.x 
-        else return 0}
-    set x(value){
-        this.collider.x = value;
-        this.element.style.left = `${value + this.offset.x}px`; 
-        this.hitboxElement.style.left = `${value}px`;
+    
+    draw(){
+        this.element.style.left = `${this.collider.x - this.offset.x}px`;
+        this.element.style.top = `${this.collider.y -    this.offset.y}px`;
+        this.hitboxElement.style.left = `${this.collider.x}px`;
+        this.hitboxElement.style.top = `${this.collider.y}px`;
     }
-
-    get y(){if(this.collider) return this.collider.y
-        else return 0
-    }
-    set y(value){
-        this.collider.y = value;
-        this.element.style.top = `${value + this.offset.y}px`; 
-        this.hitboxElement.style.top = `${value}px`;
-    }
-
-    get width(){return this.element.getBoundingClientRect().width}
-    set width(value){this.element.style.width = `${value}px`}
-
-    get height(){return this.element.getBoundingClientRect().height}
-    set height(value){this.element.style.height = `${value}px`}
-
-    get center(){return {x:this.x + this.width / 2, y:this.y + this.height / 2}}
 
 	/** Initializes animations by setting up their frame change events. */
 	#initAnimations() {
@@ -73,9 +50,8 @@ export class Entity{
 	 * Handles the animation frame change event by updating the entity's sprite.
 	 *
 	 * @param {Animation} object - The animation object.
-	 * @param {EventArgs} e - The event arguments.
 	 */
-	#animationFrameChange = (object, e) => {
+	#animationFrameChange = (object) => {
 		this.element.src = object.currentFrame.src;
 	};
 
@@ -89,11 +65,11 @@ export class Entity{
 	 * Handles the animation finish event.
 	 *
 	 * @param {Animation} object - The animation object.
-	 * @param {EventArgs} e - The event arguments.
 	 */
-	#animationFinish = (object, e) => {
+	#animationFinish = (object) => {
 		if (!object.cancelable) this.updateAnimation();
 	};
+
 	/**
      * Switches the current animation to the specified key.
      * Stops the current animation if one is active.
@@ -114,23 +90,17 @@ export class Entity{
             this.currentAnimation = animation;
         }
     }
-    magnitude() {
-        return Math.sqrt(this.vector.x * this.vector.x + this.vector.y * this.vector.y);
-    }
-    normalize() {
-        const mag = this.magnitude();
-        if (mag === 0) {
-            this.vector.x = 0;
-            this.vector.y = 0;
-        }
-        this.vector.x /= mag;
-        this.vector.y /= mag;
-    }
-    distance(){
-        return Math.sqrt(Math.pow(this.x - this.target.x, 2) + Math.pow(this.y - this.target.y, 2))
-    }
     getRandomArbitrary(min, max) {
         return Math.random() * (max - min) + min;
     }
 	updateAnimation() { }
+	setVelocityToTarget(){
+		if (!this.collider.collides(this.target)) {
+			this.collider.velocity = new Vector(this.target.x - this.collider.center.x, this.target.y - this.collider.center.y);
+			this.collider.velocity.normalize();
+			this.collider.velocity.multiply(this.speed);
+		}
+		else
+			this.collider.velocity = new Vector(0,0);
+	}
 }

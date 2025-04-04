@@ -1,4 +1,4 @@
-import { Animation } from "../animation.js"
+import { Animation as Animation } from "../animation.js"
 export class AnimationStorage{
 	static walkDown = new Animation("img/Player/Walk/down.png", 8);
 	static walkDownRight = new Animation("img/Player/Walk/right_down.png", 8);

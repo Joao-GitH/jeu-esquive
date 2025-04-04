@@ -1,8 +1,7 @@
 import { Entity } from "./entities.js"
-import { Animation } from "../animation.js";
 import { AnimationStorage } from "../Storage/animationsStorage.js";
-import { RectangleCollider } from "../PhysicsEngine/PhysicsEngine.js";
-import { EventArgs } from "../utilities/event.js";
+import { RectangleCollider, Vector } from "../PhysicsEngine/PhysicsEngine.js";
+
 export class Player extends Entity {
 	/** @protected */
     /**
@@ -33,22 +32,22 @@ export class Player extends Entity {
 		this.currentAnimation.start();
     }
 	updateDir(){
-		if(this.vector.x == 0 && this.vector.y == 0)
+		if(this.collider.velocity.x == 0 && this.collider.velocity.y == 0)
 			return;
-		if(this.vector.x < 3 && this.vector.x > -3){
-			if(this.vector.y >= 0)
+		if(this.collider.velocity.x < 3 && this.collider.velocity.x > -3){
+			if(this.collider.velocity.y >= 0)
 				this.dir = "down";
 			else
 				this.dir = "up";
 		}
-        else if(this.vector.y >= 0){
-			if(this.vector.x >= 0)
+        else if(this.collider.velocity.y >= 0){
+			if(this.collider.velocity.x >= 0)
 				this.dir = "down-right";
 			else
 				this.dir = "down-left";
 		}
-		else if(this.vector.y < 0){
-			if(this.vector.x >= 0)
+		else if(this.collider.velocity.y < 0){
+			if(this.collider.velocity.x >= 0)
 				this.dir = "up-right";
 			else
 				this.dir = "up-left";
@@ -56,7 +55,7 @@ export class Player extends Entity {
 	}
 	updateAnimation() {
 		this.updateDir();
-		if(this.magnitude() > 0)
+		if(this.collider.velocity.magnitude() > 0)
 			this.switchAnimation(`walk-${this.dir}`);
 		else
 			this.switchAnimation(`idle-${this.dir}`);

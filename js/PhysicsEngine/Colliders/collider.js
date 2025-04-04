@@ -99,6 +99,11 @@ export class Collider {
 		if (this.type === ColliderType.dynamic) {
 			this.applyCollisions();
 		}
+		else{
+			for (const collider of this.neighbors) {
+				this.oncollide(collider);
+			}
+		}
 	}
 
 	/** Draws the collider on the canvas. */

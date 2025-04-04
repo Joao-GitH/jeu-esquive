@@ -10,15 +10,17 @@ To use the libraray just download the project and import the classes you need th
 ```bash
 your-project/
 ├── script.js
-└── PhysicsEngine/
-    ├── PhysicsEngine.js
-    ├── physicsWorld.js
-    ├── vector.js
-    └── Colliders/
-        ├── circleCollider.js
-        ├── collider.js
-        ├── colliderType.js
-        └── rectangleCollider.js
+└── PhysicsEngineJS/
+	├── Colliders
+	│	├── circleCollider.js
+	│	├── collider.js
+	│	├── colliderType.js
+	│	└── rectangleCollider.js
+	├── event.js
+	├── PhysicsEngine.js
+	├── physicsWorld.js
+	├── vector.js
+	└── README.md
 ```
 
 ### Html example

@@ -1,5 +1,6 @@
 import { Animation } from "../animation.js";
 import { EventArgs } from "../utilities/event.js";
+import { RectangleCollider } from "../PhysicsEngine/PhysicsEngine.js";
 export class Entity{
     /** @type {Animation} */
     currentAnimation;
@@ -8,21 +9,22 @@ export class Entity{
      *
      * @constructor
      * @param {HTMLImageElement} element 
-     * @param {{ width:number ,height:number, offsetX:number, offsetY:number}} hitbox
+     * @param {RectangleCollider} collider
+     * @param {{x:number, y:number}} offset
      * @param {Map<string, Animation>} [animations=new Map()]
      */
-    constructor(element, hitbox ,animations = new Map()){
+    constructor(element, collider, offset, animations = new Map()){
         this.element = element;
         this.element.style.position = "absolute";
         this.vector = {x:0, y:0};
         this.target = {x:this.x, y:this.y}
         this.speed = 5;
         this.animations = animations;
-        this.hitbox = hitbox;
-
+        this.collider = collider;
+        this.offset = offset;
         this.hitboxElement = document.createElement("div");
-        this.hitboxElement.style.width = `${hitbox.width}px`;
-        this.hitboxElement.style.height = `${hitbox.height}px`;
+        this.hitboxElement.style.width = `${collider.width}px`;
+        this.hitboxElement.style.height = `${collider.height}px`;
         this.hitboxElement.classList.add("hitbox");
         document.body.append(this.hitboxElement);
 
@@ -35,11 +37,22 @@ export class Entity{
 		this.#initAnimations();
     }
 
-    get x(){return parseInt(this.element.style.left)}
-    set x(value){this.element.style.left = `${value}px`; this.hitboxElement.style.left = `${value + this.hitbox.offsetX}px`;}
+    get x(){ if(this.collider) return this.collider.x 
+        else return 0}
+    set x(value){
+        this.collider.x = value;
+        this.element.style.left = `${value + this.offset.x}px`; 
+        this.hitboxElement.style.left = `${value}px`;
+    }
 
-    get y(){return parseInt(this.element.style.top)}
-    set y(value){this.element.style.top = `${value}px`; this.hitboxElement.style.top = `${value + this.hitbox.offsetY}px`;}
+    get y(){if(this.collider) return this.collider.y
+        else return 0
+    }
+    set y(value){
+        this.collider.y = value;
+        this.element.style.top = `${value + this.offset.y}px`; 
+        this.hitboxElement.style.top = `${value}px`;
+    }
 
     get width(){return this.element.getBoundingClientRect().width}
     set width(value){this.element.style.width = `${value}px`}

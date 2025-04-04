@@ -1,8 +1,9 @@
 import { AnimationStorage } from "./Storage/animationsStorage.js";
 import { Player, Fireball } from "./Entities/entities.js";
+import { RectangleCollider as Rect, RectangleCollider } from "./PhysicsEngine/PhysicsEngine.js";
 
 
-const player = new Player(document.querySelector("#joueur"), { width: 60, height: 63, offsetX: 70, offsetY: 68});
+const player = new Player(document.querySelector("#joueur"), new Rect(0,0, 60, 63), {x: 70, y: 68});
 
 let score = document.querySelector("#score")
 score.textContent = "0"
@@ -31,38 +32,52 @@ function movePlayer(e) {
     if (mouseDown) {
         player.target.x = e.clientX
         player.target.y = e.clientY
-        player.vector.x = player.target.x - player.center.x;
-        player.vector.y = player.target.y - player.center.y;
+        player.collider.velocity.x = player.target.x - player.center.x;
+        player.collider.velocity.y = player.target.y - player.center.y;
         player.normalize();
-        player.vector.x *= player.speed;
-        player.vector.y *= player.speed;
+        player.collider.velocity.x *= player.speed;
+        player.collider.velocity.y *= player.speed;
     }
 }
 
 function move() {
     if (!(player.target.x >= player.center.x && player.target.x <= player.width - player.center.x
         && player.target.y >= player.center.y && player.target.y <= player.height - player.center.y)) {
-        player.x += player.vector.x;
-        player.y += player.vector.y;
-        player.vector.x = player.target.x - player.center.x;
-        player.vector.y = player.target.y - player.center.y;
+        player.x += player.collider.velocity.x;
+        player.y += player.collider.velocity.y;
+        player.collider.velocity.x = player.target.x - player.center.x;
+        player.collider.velocity.y = player.target.y - player.center.y;
         player.normalize();
-        player.vector.x *= player.speed;
-        player.vector.y *= player.speed;
+        player.collider.velocity.x *= player.speed;
+        player.collider.velocity.y *= player.speed;
     }
     else
-        player.vector = { x: 0, y: 0 };
+        player.collider.velocity = { x: 0, y: 0 };
     player.updateAnimation();
     requestAnimationFrame(move);
 }
 move();
+ 
+setInterval(() => {
+    Main()
+}, 500)
 
-Main()
 // Fonction principale qui démarre la génération des boules
 function Main() {
-    setInterval(() => {
-        GenererBoule(GenererPosition()) // Génère une boule toutes les secondes
-    }, 1000)
+    return  new Promise((resolve) => {
+        if (score.textContent == 180) {
+            setTimeout(() => {
+                GenererBoule(GenererPosition()) // Génère une boule toutes les secondes
+                resolve()
+            }, 1)
+        }
+        else{
+            setTimeout(() => {
+                GenererBoule(GenererPosition()) // Génère une boule toutes les secondes
+                resolve()
+            }, 1000 - Number(score.textContent) * 100)
+        }
+    });
 }
 
 // Fonction pour générer une boule à une position donnée
@@ -75,7 +90,7 @@ function GenererBoule(p) {
     // Définition des styles de la boule
     boule.style.top = `${p[1]}px` // Position verticale aléatoire
     boule.style.left = `${p[0]}px` // Position horizontale aléatoire
-    let fireball = new Fireball(boule, { width: 75, height: 42, offsetX: 112, offsetY: 129 })
+    let fireball = new Fireball(boule, new Rect(0,0,75,42), {x: 112, y: 129 })
     GenererDirection(fireball) // Démarre le mouvement de la boule
 }
 
@@ -122,11 +137,11 @@ function GenererDirection(p) {
 
     p.target.x = player.x + player.width / 2
     p.target.y = player.y + player.height / 2
-    p.vector.x = p.target.x - p.x;
-    p.vector.y = p.target.y - p.y;
+    p.collider.velocity.x = p.target.x - p.x;
+    p.collider.velocity.y = p.target.y - p.y;
     p.normalize();
-    p.vector.x *= p.speed;
-    p.vector.y *= p.speed;
+    p.collider.velocity.x *= p.speed;
+    p.collider.velocity.y *= p.speed;
     p.element.style.transform = `rotate(${trouverAngle(p, player)}deg)`;
     setInterval(() => {
         movefireball(p)
@@ -134,8 +149,8 @@ function GenererDirection(p) {
 }
 /** @param {Fireball} p  */
 function movefireball(p) {
-    p.x += p.vector.x;
-    p.y += p.vector.y;
+    p.x += p.collider.velocity.x;
+    p.y += p.collider.velocity.y;
     if (p.x < 0 || p.x > screen.width) {
         p.element.remove()
         return
@@ -147,10 +162,10 @@ function movefireball(p) {
 
     // Assuming player has width and height properties (for example, player.width and player.height)
     if (
-        p.center.x < player.x + player.hitbox.offsetX + player.center.x + player.width &&
-        p.center.x + p.hitbox.offsetX > player.x + player.hitbox.offsetX + player.center.x &&
-        p.center.y < player.y + player.hitbox.offsetY + player.center.y + player.height &&
-        p.center.y + p.hitbox.offsetX > player.y + player.hitbox.offsetY + player.center.y
+        p.center.x < player.x + player.offset.x + player.center.x + player.width &&
+        p.center.x + p.offset.x > player.x + player.offset.x + player.center.x &&
+        p.center.y < player.y + player.offset.y + player.center.y + player.height &&
+        p.center.y + p.offset.x > player.y + player.offset.y + player.center.y
     ) {
         p.element.remove();  // Remove the fireball element
 

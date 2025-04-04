@@ -1,5 +1,6 @@
 import { AnimationStorage } from "../Storage/animationsStorage.js";
 import { Entity } from "./entities.js"
+import { Collider, RectangleCollider } from "../PhysicsEngine/PhysicsEngine.js";
 export class Fireball extends Entity {
 
     /**
@@ -7,10 +8,11 @@ export class Fireball extends Entity {
      *
      * @constructor
      * @param {HTMLImageElement} element 
-     * @param {{ width:number ,height:number, offsetX:number, offsetY:number}} hitbox
+     * @param {RectangleCollider} collider
+     * @param {{x:number, y:number}} offset
      */
-    constructor(element,hitbox) {
-        super(element, hitbox,new Map([
+    constructor(element,collider,offset) {
+        super(element, collider,offset,new Map([
             ["idle", AnimationStorage.fireball]
         ]))
         this.speed = this.getRandomArbitrary(5, 10)

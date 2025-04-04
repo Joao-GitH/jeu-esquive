@@ -1,6 +1,7 @@
 import { Entity } from "./entities.js"
 import { Animation } from "../animation.js";
 import { AnimationStorage } from "../Storage/animationsStorage.js";
+import { RectangleCollider } from "../PhysicsEngine/PhysicsEngine.js";
 import { EventArgs } from "../utilities/event.js";
 export class Player extends Entity {
 	/** @protected */
@@ -9,10 +10,11 @@ export class Player extends Entity {
      *
      * @constructor
      * @param {HTMLImageElement} element 
-     * @param {{ width:number ,height:number, offsetX:number, offsetY:number}} hitbox
+     * @param {RectangleCollider} collider
+     * @param {{x:number, y:number}} offset
      */
-    constructor(element, hitbox) {
-        super(element, hitbox,new Map([
+    constructor(element, collider, offset) {
+        super(element, collider, offset,new Map([
             ["idle-down", AnimationStorage.idleDown],
 			["idle-down-right", AnimationStorage.idleDownRight],
 			["idle-down-left", AnimationStorage.idleDownLeft],

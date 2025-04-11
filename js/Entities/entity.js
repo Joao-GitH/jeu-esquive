@@ -24,7 +24,7 @@ export class Entity{
         this.hitboxElement.style.width = `${collider.width}px`;
         this.hitboxElement.style.height = `${collider.height}px`;
         this.hitboxElement.classList.add("hitbox");
-        document.body.append(this.hitboxElement);
+        //document.body.append(this.hitboxElement);
 		for (const [key, value] of this.animations) {
 			this.animations.set(key, value.clone());
 		}

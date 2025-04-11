@@ -20,7 +20,6 @@ body{
     image-rendering: pixelated;
 }
 .hitbox{
-    background-color: rgba(0, 0, 255, 0.445);
     position: absolute;
 }
 body{

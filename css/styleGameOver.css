@@ -55,7 +55,17 @@ p {
     font-size: 17px;
 
 }
-
+#restartbtn{
+    margin-top: 3px;
+    background: rgb(13, 165, 13);
+    color: white;
+    border-radius: 5px;
+    height: 36px;
+    width: 85px;
+    border: none;
+    transition-duration: 0.5s;
+    font-size: 17px;
+}
 .popup button {
     margin-top: 6px;
 }

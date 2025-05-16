@@ -1,5 +1,6 @@
 // To access the Close button element
 let closebtn = document.getElementById("closebtn");
+let restartbtn = document.getElementById("restartbtn");
 
 // To acces the popup element
 let popup = document.querySelector(".popup");
@@ -59,6 +60,9 @@ closebtn.addEventListener("click", () => {
     }
 });
 
+restartbtn.addEventListener("click", (e) => {
+    window.location.href = 'game.html';
+})
 
 function genererClassement(data) {
 

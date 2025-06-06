@@ -33,7 +33,7 @@ export class Entity {
 		this.collider = collider;
 		this.hitbox = document.createElement("div");
 		this.#setHitbox();
-		document.body.append(this.hitbox);
+		//document.body.append(this.hitbox);
 		this.target = new CircleCollider(collider.x, collider.y, 10)
 		this.spriteOffset = spriteOffset;
 		this.animationManager = new AnimationManager(sources);

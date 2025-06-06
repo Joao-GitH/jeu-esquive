@@ -6,6 +6,7 @@
     height: 300px;
     image-rendering: pixelated;
     position: absolute;
+    border: none;
 }
 body{
     overflow: hidden;
@@ -18,8 +19,10 @@ body{
     width: 200px;
     height: 200px;
     image-rendering: pixelated;
+    position: absolute;
 }
 .hitbox{
+    background-color: rgba(127, 255, 212, 0.281);
     position: absolute;
 }
 body{
@@ -27,4 +30,33 @@ body{
     background-size: cover;  /* Ajuste l'image pour couvrir toute la fenêtre */
     background-repeat: no-repeat; /* Empêche la répétition */
     background-position: center center; /* Centre l'image */
+}
+.skill {
+    height: 10vh;
+    width: 10vh;
+    position: fixed;
+}
+#flash{
+    bottom: 10px;
+    left: 10px;
+}
+#barriere{
+    bottom: 10px;
+    left: calc(10px + 5vw + 10px)
+}
+#ghost{
+    bottom: 10px;
+    left: calc(10px + 5vw + 10px + 5vw + 10px)
+}
+#score{
+    left: calc(100vw / 2);
+    top: 10px;
+    position: absolute;
+    color: white;
+}
+#skill-sprite {
+    width: 200px;
+    height: 200px;
+    image-rendering: pixelated;
+    position: absolute;
 }

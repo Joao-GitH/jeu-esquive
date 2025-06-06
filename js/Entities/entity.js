@@ -1,99 +1,96 @@
-import { Animation } from "../animation.js";
-import { CircleCollider, RectangleCollider, Event, Vector } from "../PhysicsEngine/PhysicsEngine.js";
-export class Entity{
-    /** @type {Animation} */
-    currentAnimation;
-    /**
-     * Creates an instance of Entity.
-     *
-     * @constructor
-     * @param {HTMLImageElement} element 
-     * @param {RectangleCollider} collider
-     * @param {{x:number, y:number}} offset
-     * @param {Map<string, Animation>} [animations=new Map()]
-     */
-    constructor(element, collider, offset, animations = new Map()){
-        this.element = element;
-        this.element.style.position = "absolute";
-        this.target = new CircleCollider(collider.x, collider.y, 10)
-        this.speed = 5;
-        this.animations = animations;
-        this.collider = collider;
-        this.offset = offset;
-        this.hitboxElement = document.createElement("div");
-        this.hitboxElement.style.width = `${collider.width}px`;
-        this.hitboxElement.style.height = `${collider.height}px`;
-        this.hitboxElement.classList.add("hitbox");
-        //document.body.append(this.hitboxElement);
-		for (const [key, value] of this.animations) {
-			this.animations.set(key, value.clone());
-		}
-		this.#addEventFinishAnimations();
-		this.#initAnimations();
-    }
-    
-    draw(){
-        this.element.style.left = `${this.collider.x - this.offset.x}px`;
-        this.element.style.top = `${this.collider.y -    this.offset.y}px`;
-        this.hitboxElement.style.left = `${this.collider.x}px`;
-        this.hitboxElement.style.top = `${this.collider.y}px`;
-    }
+import { AnimationManager } from "../utilities/animationManager.js";
+import { Event } from "../event.js";
+import { CircleCollider, Collider, Point, RectangleCollider, Vector } from "../PhysicsEngine/PhysicsEngine.js";
+import SpriteSheet from "../utilities/spriteSheet.js";
 
-	/** Initializes animations by setting up their frame change events. */
-	#initAnimations() {
-		for (const animation of this.animations.values()) {
-			animation.frameChange.add(this.#animationFrameChange);
+/**
+ * Represents an entity in the game.
+ * 
+ * An entity has animations, a collider, a direction.
+ */
+export class Entity {
+	/** Movement speed of the entity */
+	speed = 5;
+	/** Current facing direction of the entity */
+	direction = new Point(1, 0);
+	/** Animation manager handling current animation state */
+	animationManager;
+
+	/** Current sprite image to render for the entity @type {HTMLImageElement | null}*/
+	sprite = new Image();
+
+	/**
+	 * Creates an instance of Entity.
+	 *
+	 * @constructor
+	 * @param {string} name - Name of the entity
+	 * @param {Collider} collider - Collider object for physics and positioning
+	 * @param {Point} [spriteOffset=new Point(0, 0)] - Offset to apply to sprite drawing
+	 * @param {SpriteSheet[]} [sources=[]] 
+	 */
+	constructor(name, collider, spriteOffset = new Point(0, 0), sources = []) {
+		this.name = name;
+		this.collider = collider;
+		this.hitbox = document.createElement("div");
+		this.#setHitbox();
+		document.body.append(this.hitbox);
+		this.target = new CircleCollider(collider.x, collider.y, 10)
+		this.spriteOffset = spriteOffset;
+		this.animationManager = new AnimationManager(sources);
+		this.animationManager.frameChange.add(this.animationFrameChange);
+		document.body.append(this.sprite);
+	}
+
+	/** 
+	 * Updates the entity's facing direction based on its current velocity.
+	 * 
+	 * This method sets the direction vector to indicate the last non-zero movement direction.
+	 * 
+	 * @protected
+	 */
+	setDirection() {
+		const velocity = this.collider.velocity;
+		if (velocity.x != 0 && velocity.y != 0) {
+			if (velocity.x > 0)
+				this.direction.x = 1;
+			else if (velocity.x < 0)
+				this.direction.x = -1;
+
+			if (velocity.y > 0)
+				this.direction.y = 1;
+			else if (velocity.y < 0)
+				this.direction.y = -1;
+		}
+	}
+
+	#setHitbox(){
+		this.hitbox.className = "hitbox";
+		this.hitbox.style.left = `${this.collider.x}px`;
+		this.hitbox.style.top = `${this.collider.y}px`;
+		if(this.collider instanceof RectangleCollider){
+			this.hitbox.style.height = `${this.collider.height}px`;
+			this.hitbox.style.width = `${this.collider.width}px`;
 		}
 	}
 
 	/**
-	 * Handles the animation frame change event by updating the entity's sprite.
+	 * Handles animation frame changes by updating the entity's sprite.
 	 *
-	 * @param {Animation} object - The animation object.
+	 * @param {AnimationManager} obj - The animation object.
+	 * @protected
 	 */
-	#animationFrameChange = (object) => {
-		this.element.src = object.currentFrame.src;
-	};
+	animationFrameChange = (obj) => {
+		this.sprite.src = obj.spriteURL();
+	}
+	
+	
+	draw() {
+		this.sprite.style.left = `${this.collider.x - this.spriteOffset.x}px`;
+		this.sprite.style.top = `${this.collider.y - this.spriteOffset.y}px`;
+		this.hitbox.style.left = `${this.collider.x}px`;
+		this.hitbox.style.top = `${this.collider.y}px`;
+	}
 
-	/** Adds an event listener for animation finish events. */
-    #addEventFinishAnimations() {
-        for (const animation of this.animations.values()) {
-            animation.finish.add(this.#animationFinish);
-        }
-    }
-	/**
-	 * Handles the animation finish event.
-	 *
-	 * @param {Animation} object - The animation object.
-	 */
-	#animationFinish = (object) => {
-		if (!object.cancelable) this.updateAnimation();
-	};
-
-	/**
-     * Switches the current animation to the specified key.
-     * Stops the current animation if one is active.
-     *
-     * @param {string} key - The key of the animation to switch to.
-     * @throws {Error} If the animation key does not exist.
-     */
-    switchAnimation(key) {
-        const animation = this.animations.get(key);
-        if (animation === undefined) {
-            throw new Error(`There's no animation with the key: "${key}"`);
-        }
-        if (this.currentAnimation !== null && this.currentAnimation !== animation && this.currentAnimation.cancelable) {
-            this.currentAnimation.stop();
-        }
-        if (this.currentAnimation === null || !this.currentAnimation.playing) {
-            animation.start();
-            this.currentAnimation = animation;
-        }
-    }
-    getRandomArbitrary(min, max) {
-        return Math.random() * (max - min) + min;
-    }
-	updateAnimation() { }
 	setVelocityToTarget(){
 		if (!this.collider.collides(this.target)) {
 			this.collider.velocity = new Vector(this.target.x - this.collider.center.x, this.target.y - this.collider.center.y);

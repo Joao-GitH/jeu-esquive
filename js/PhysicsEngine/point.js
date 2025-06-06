@@ -25,17 +25,17 @@ export class Point {
 	get x() { return this.#x; }
 	set x(value) { 
 		if(value > 0)
-			this.#x = Math.floor(value * 10) / 10;
+			this.#x = Math.floor(value * 1000) / 1000;
 		else
-			this.#x = Math.ceil(value * 10) / 10;
+			this.#x = Math.ceil(value * 1000) / 1000;
 	}
 
 	/** The Y coordinate of the point. */
 	get y() { return this.#y; }
 	set y(value) { 
 		if(value > 0)
-			this.#y = Math.floor(value * 10) / 10;
+			this.#y = Math.floor(value * 1000) / 1000;
 		else
-			this.#y = Math.ceil(value * 10) / 10;
+			this.#y = Math.ceil(value * 1000) / 1000;
 	}
 }

@@ -40,6 +40,8 @@ export class Collider {
 	get center() { return null }
 
 
+	/** Description @readonly */
+	get onGround(){return this.neighbors.some(neighbor => neighbor.y > this.y && this.collides(neighbor))}
 	/**
 	 * Creates an instance of `Collider`.
 	 * 
@@ -99,10 +101,9 @@ export class Collider {
 		if (this.type === ColliderType.dynamic) {
 			this.applyCollisions();
 		}
-		else{
-			for (const collider of this.neighbors) {
+		for (const collider of this.neighbors) {
+			if (!this.#collided.includes(collider)) // Avoid duplicate collision handling
 				this.oncollide(collider);
-			}
 		}
 	}
 
@@ -114,10 +115,9 @@ export class Collider {
 	/** Applies gravity to the collider if it is dynamic. @protected */
 	applyGravity() {
 		if (this.type === ColliderType.dynamic) {
-			const isTouchingGround = this.neighbors.some(neighbor => neighbor.y > this.y && this.collides(neighbor));
 
 			// If not touching the ground, apply gravity
-			if (!isTouchingGround) {
+			if (!this.onGround) {
 				this.velocity.add(this.world.gravity);
 			}
 		}
@@ -146,9 +146,6 @@ export class Collider {
 	/** Handles collisions with other colliders. @protected */
 	applyCollisions() {
 		for (const collider of this.neighbors) {
-			if (!this.#collided.includes(collider)) // Avoid duplicate collision handling
-				this.oncollide(collider);
-
 			// Ignore collisions with transparent colliders
 			if (collider.type !== ColliderType.transparent) {
 				if (collider instanceof RectangleCollider) {
